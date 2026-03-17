@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: agent_intergator
+    env: node
+    branch: main
+    plan: starter
+    region: ord
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        from: env
+      - key: SESSION_SECRET
+        from: env
+      - key: REPL_ID
+        from: env
+      - key: ISSUER_URL
+        from: env
+      - key: AI_INTEGRATIONS_OPENAI_API_KEY
+        from: env
+      - key: FRONTEND_ORIGIN
+        from: env
+
+*** End Patch
