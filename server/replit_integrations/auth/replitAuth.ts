@@ -8,6 +8,8 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { authStorage } from "./storage";
 
+const useOidc = !!process.env.REPL_ID;
+
 const getOidcConfig = memoize(
   async () => {
     return await client.discovery(
@@ -63,6 +65,31 @@ async function upsertUser(claims: any) {
 export async function setupAuth(app: Express) {
   app.set("trust proxy", 1);
   app.use(getSession());
+
+  // If REPL_ID is not set, skip OIDC and provide a lightweight local session login
+  if (!useOidc) {
+    // lightweight routes for local/dev or when external auth is disabled
+    app.post(
+      "/api/login-local",
+      (req: any, res: any) => {
+        const userId = req.body?.userId || "local:demo";
+        const claims = { sub: userId, email: req.body?.email || null };
+        // ensure user exists in DB
+        upsertUser(claims).catch(console.error);
+        // attach to session
+        (req.session as any).user = { claims, expires_at: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60 };
+        res.json({ ok: true, user: claims });
+      }
+    );
+
+    app.get("/api/logout", (req, res) => {
+      req.session.destroy(() => res.json({ ok: true }));
+    });
+
+    return;
+  }
+
+  // --- OIDC path (unchanged) ---
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -131,6 +158,14 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  // If OIDC is disabled, use local session
+  if (!useOidc) {
+    const sess = req.session as any;
+    const user = sess?.user;
+    if (!user) return res.status(401).json({ message: "Unauthorized" });
+    return next();
+  }
+
   const user = req.user as any;
 
   if (!req.isAuthenticated() || !user.expires_at) {
