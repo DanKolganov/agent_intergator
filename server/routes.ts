@@ -607,17 +607,18 @@ ${JSON.stringify(candidates)}
 
       // First, assess if we have enough context
       const assessmentPrompt = `
-        Analyze if the following business request has enough details to create an AI agent.
+        Проанализируй, достаточно ли информации в запросе бизнеса для создания AI-агента.
+        ОБЯЗАТЕЛЬНО отвечай на РУССКОМ языке.
         
-        Business: ${customReq.businessName}
-        Needs: ${customReq.businessNeeds}
-        ${contextData.length > 0 ? `Previous Q&A:\n${contextData.map((c: any) => `Q: ${c.question}\nA: ${c.answer}`).join('\n')}` : ''}
+        Бизнес: ${customReq.businessName}
+        Потребности: ${customReq.businessNeeds}
+        ${contextData.length > 0 ? `Предыдущие вопросы и ответы:\n${contextData.map((c: any) => `В: ${c.question}\nО: ${c.answer}`).join('\n')}` : ''}
         
-        Respond in JSON:
+        Ответь в формате JSON:
         {
           "hasEnoughContext": true/false,
-          "questionToAsk": "specific clarifying question if context is insufficient, or null if sufficient",
-          "reasoning": "brief explanation"
+          "questionToAsk": "конкретный уточняющий вопрос на РУССКОМ языке, если информации недостаточно, или null если достаточно",
+          "reasoning": "краткое объяснение на русском"
         }
       `;
 
@@ -656,23 +657,23 @@ ${JSON.stringify(candidates)}
 
       // Generate final recommendation
       const prompt = `
-        A business has the following details:
-        Name: ${customReq.businessName}
-        Needs: ${customReq.businessNeeds}
-        ${contextData.length > 0 ? `Additional context from Q&A:\n${contextData.map((c: any) => `Q: ${c.question}\nA: ${c.answer}`).join('\n\n')}` : ''}
+        У бизнеса следующие детали:
+        Название: ${customReq.businessName}
+        Потребности: ${customReq.businessNeeds}
+        ${contextData.length > 0 ? `Дополнительный контекст из диалога:\n${contextData.map((c: any) => `Вопрос: ${c.question}\nОтвет: ${c.answer}`).join('\n\n')}` : ''}
         
-        Task:
-        1. Provide a detailed recommendation for what kind of AI Agent they need (at least 3-4 sentences).
-        2. Generate a complete Python script (agent.py) that implements this agent.
-        3. Generate a complete README.md with installation and usage instructions.
+        Задание (ОБЯЗАТЕЛЬНО отвечай на РУССКОМ языке):
+        1. Подробная рекомендация по AI-агенту для бизнеса (минимум 3-4 предложения).
+        2. Полный Python скрипт (agent.py) реализующий этого агента.
+        3. Полный README.md с инструкциями по установке.
 
-        Important: Return a valid JSON object with these exact string fields:
+        Важно: Верни валидный JSON с этими строковыми полями:
         {
-          "recommendation": "string with detailed recommendation...",
-          "code": "string with full Python code...",
-          "readme": "string with full markdown readme..."
+          "recommendation": "строка с подробной рекомендацией на русском...",
+          "code": "строка с Python кодом...",
+          "readme": "строка с markdown инструкцией на русском..."
         }
-        All values must be strings, not objects.
+        Все значения должны быть строками, не объектами.
       `;
 
       const response = await openai.chat.completions.create({
