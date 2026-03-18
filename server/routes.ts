@@ -11,8 +11,12 @@ import { eq, sql } from "drizzle-orm";
 
 function getLLMClient() {
   const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
-  const baseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+  let baseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
   if (!apiKey) return null;
+  // Remove trailing slash to avoid /v1./chat/completions error with Groq
+  if (baseURL) {
+    baseURL = baseURL.replace(/\/$/, '');
+  }
   return new OpenAI({ apiKey, baseURL });
 }
 
@@ -600,7 +604,7 @@ ${JSON.stringify(candidates)}
       `;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-5.2",
+        model: getLLMModel(),
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
       });
