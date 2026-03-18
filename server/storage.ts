@@ -17,7 +17,7 @@ export interface IStorage {
   getCustomRequests(): Promise<CustomAgentRequest[]>;
   getCustomRequest(id: number): Promise<CustomAgentRequest | undefined>;
   createCustomRequest(req: InsertCustomAgentRequest): Promise<CustomAgentRequest>;
-  updateCustomRequestStatus(id: number, status: string, recommendation?: string, generatedCode?: string, generatedReadme?: string): Promise<CustomAgentRequest>;
+  updateCustomRequestStatus(id: number, status: string, recommendation?: string, generatedCode?: string, generatedReadme?: string, followUpCount?: number, contextData?: string, lastQuestion?: string): Promise<CustomAgentRequest>;
 
   recordView(userId: string, agentId: number): Promise<void>;
   getViewHistory(userId: string): Promise<Agent[]>;
@@ -52,11 +52,14 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async updateCustomRequestStatus(id: number, status: string, recommendation?: string, generatedCode?: string, generatedReadme?: string): Promise<CustomAgentRequest> {
+  async updateCustomRequestStatus(id: number, status: string, recommendation?: string, generatedCode?: string, generatedReadme?: string, followUpCount?: number, contextData?: string, lastQuestion?: string): Promise<CustomAgentRequest> {
     const updateData: any = { status };
     if (recommendation !== undefined) updateData.recommendation = recommendation;
     if (generatedCode !== undefined) updateData.generatedCode = generatedCode;
     if (generatedReadme !== undefined) updateData.generatedReadme = generatedReadme;
+    if (followUpCount !== undefined) updateData.followUpCount = followUpCount;
+    if (contextData !== undefined) updateData.contextData = contextData;
+    if (lastQuestion !== undefined) updateData.lastQuestion = lastQuestion;
 
     const [updated] = await db.update(customAgentRequests)
       .set(updateData)

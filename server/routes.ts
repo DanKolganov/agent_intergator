@@ -570,10 +570,10 @@ ${JSON.stringify(candidates)}
 
       await storage.updateCustomRequestStatus(customReq.id, 'analyzing');
 
-      const openai = new OpenAI({
-        apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-        baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-      });
+      const openai = getLLMClient();
+      if (!openai) {
+        return res.status(503).json({ message: "AI service unavailable" });
+      }
 
       const quota = await enforceFreeLlmQuota(req);
       if (!quota.allowed) {
@@ -585,22 +585,94 @@ ${JSON.stringify(candidates)}
         });
       }
 
+      const followUpCount = customReq.followUpCount || 0;
+      const contextData = customReq.contextData ? JSON.parse(customReq.contextData) : [];
+
+      // If too many follow-ups, offer consultation
+      if (followUpCount >= 3) {
+        const consultationMessage = `На основе предоставленной информации:\n\n${contextData.map((c: any) => `Вопрос: ${c.question}\nОтвет: ${c.answer}`).join('\n\n')}\n\n**Предлагаем вам личную консультацию** с нашим специалистом для детальной проработки решения.\n\nСвяжитесь с нами:\n• Telegram: @your_support\n• Email: support@example.com\n• Телефон: +7 (XXX) XXX-XX-XX\n\nМы поможем создать идеального AI-агента для вашего бизнеса!`;
+        
+        const updatedReq = await storage.updateCustomRequestStatus(
+          customReq.id, 'completed',
+          consultationMessage,
+          "# Консультация требуется",
+          "# README не применим",
+          followUpCount,
+          customReq.contextData || undefined,
+          undefined
+        );
+        await incrementLlmUsage(req);
+        return res.json(updatedReq);
+      }
+
+      // First, assess if we have enough context
+      const assessmentPrompt = `
+        Analyze if the following business request has enough details to create an AI agent.
+        
+        Business: ${customReq.businessName}
+        Needs: ${customReq.businessNeeds}
+        ${contextData.length > 0 ? `Previous Q&A:\n${contextData.map((c: any) => `Q: ${c.question}\nA: ${c.answer}`).join('\n')}` : ''}
+        
+        Respond in JSON:
+        {
+          "hasEnoughContext": true/false,
+          "questionToAsk": "specific clarifying question if context is insufficient, or null if sufficient",
+          "reasoning": "brief explanation"
+        }
+      `;
+
+      const assessmentResponse = await openai.chat.completions.create({
+        model: getLLMModel(),
+        messages: [{ role: "user", content: assessmentPrompt }],
+        response_format: { type: "json_object" },
+      });
+
+      let assessment: any = {};
+      try {
+        assessment = JSON.parse(assessmentResponse.choices[0]?.message?.content || "{}");
+      } catch {
+        assessment = { hasEnoughContext: true };
+      }
+
+      // If not enough context, ask follow-up question
+      if (!assessment.hasEnoughContext && assessment.questionToAsk && followUpCount < 3) {
+        const newContextData = [...contextData, { question: assessment.questionToAsk, answer: null }];
+        
+        const updatedReq = await storage.updateCustomRequestStatus(
+          customReq.id, 'needs_clarification',
+          undefined, undefined, undefined,
+          followUpCount + 1,
+          JSON.stringify(newContextData),
+          assessment.questionToAsk
+        );
+        await incrementLlmUsage(req);
+        return res.json({
+          ...updatedReq,
+          needsClarification: true,
+          question: assessment.questionToAsk,
+          followUpCount: followUpCount + 1
+        });
+      }
+
+      // Generate final recommendation
       const prompt = `
         A business has the following details:
         Name: ${customReq.businessName}
         Needs: ${customReq.businessNeeds}
+        ${contextData.length > 0 ? `Additional context from Q&A:\n${contextData.map((c: any) => `Q: ${c.question}\nA: ${c.answer}`).join('\n\n')}` : ''}
         
         Task:
-        1. Provide a recommendation for what kind of AI Agent they need and how it can help them.
-        2. Generate a Python script (agent.py) that implements a basic version of this agent using OpenAI.
-        3. Generate a README.md explaining how to install dependencies and run this agent.
+        1. Provide a detailed recommendation for what kind of AI Agent they need (at least 3-4 sentences).
+        2. Generate a complete Python script (agent.py) that implements this agent.
+        3. Generate a complete README.md with installation and usage instructions.
 
-        Respond in JSON format:
+        Important: Return a valid JSON object with these exact string fields:
         {
-          "recommendation": "...",
-          "code": "...",
-          "readme": "..."
+          "recommendation": "string with detailed recommendation...",
+          "code": "string with full Python code...",
+          "readme": "string with full markdown readme..."
         }
+        All values must be strings, not objects.
       `;
 
       const response = await openai.chat.completions.create({
@@ -611,17 +683,69 @@ ${JSON.stringify(candidates)}
 
       await incrementLlmUsage(req);
 
-      const result = JSON.parse(response.choices[0]?.message?.content || "{}");
+      const content = response.choices[0]?.message?.content || "{}";
+      let result: any = {};
+      try {
+        result = JSON.parse(content);
+      } catch {
+        result = { recommendation: content, code: "# No code generated", readme: "# No readme generated" };
+      }
+      
+      const normalizeToString = (val: any): string => {
+        if (!val) return "";
+        if (typeof val === "string") return val;
+        if (typeof val === "object") return JSON.stringify(val, null, 2);
+        return String(val);
+      };
+      
       const updatedReq = await storage.updateCustomRequestStatus(
         customReq.id, 'completed',
-        result.recommendation || "We recommend a custom workflow agent.",
-        result.code || "# No code generated",
-        result.readme || "# No readme generated",
+        normalizeToString(result.recommendation) || "Мы рекомендуем AI-агента для автоматизации ваших бизнес-процессов.",
+        normalizeToString(result.code) || "# Код не был сгенерирован",
+        normalizeToString(result.readme) || "# README не был сгенерирован",
+        followUpCount,
+        customReq.contextData || undefined,
+        undefined
       );
       res.json(updatedReq);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Failed to analyze request" });
+    }
+  });
+
+  // Answer follow-up question endpoint
+  app.post(api.customRequests.answer.path, async (req, res) => {
+    try {
+      const customReq = await storage.getCustomRequest(Number(req.params.id));
+      if (!customReq) return res.status(404).json({ message: 'Request not found' });
+
+      const { answer } = req.body;
+      if (!answer || typeof answer !== 'string') {
+        return res.status(400).json({ message: 'Answer is required' });
+      }
+
+      // Update context with user's answer
+      const contextData = customReq.contextData ? JSON.parse(customReq.contextData) : [];
+      const lastEntry = contextData[contextData.length - 1];
+      if (lastEntry) {
+        lastEntry.answer = answer;
+      }
+
+      await storage.updateCustomRequestStatus(
+        customReq.id,
+        'analyzing',
+        undefined, undefined, undefined,
+        customReq.followUpCount,
+        JSON.stringify(contextData),
+        undefined
+      );
+
+      // Trigger re-analysis
+      res.json({ success: true, message: 'Answer recorded, re-analyzing...' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Failed to record answer" });
     }
   });
 

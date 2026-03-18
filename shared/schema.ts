@@ -26,6 +26,9 @@ export const customAgentRequests = pgTable("custom_agent_requests", {
   recommendation: text("recommendation"),
   generatedCode: text("generated_code"),
   generatedReadme: text("generated_readme"),
+  followUpCount: integer("follow_up_count").default(0).notNull(),
+  contextData: text("context_data"), // JSON string with conversation history
+  lastQuestion: text("last_question"), // Last follow-up question asked
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 

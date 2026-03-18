@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { motion } from "framer-motion";
-import { Loader2, CheckCircle2, AlertCircle, Sparkles, Building2, TerminalSquare, FileCode, Download } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, Sparkles, Building2, TerminalSquare, FileCode, Download, MessageCircle, Send, Headphones } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { useCustomRequest, useAnalyzeCustomRequest } from "../hooks/use-custom-requests";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function RequestStatus() {
   const [, params] = useRoute("/custom/:id");
@@ -12,6 +13,9 @@ export default function RequestStatus() {
   const { data: request, isLoading, error } = useCustomRequest(requestId!);
   const analyzeMutation = useAnalyzeCustomRequest();
   const [activeTab, setActiveTab] = useState<'recommendation' | 'code' | 'readme'>('recommendation');
+  const [answer, setAnswer] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
   // Trigger analysis if it's pending and we haven't already started
   useEffect(() => {
@@ -24,6 +28,31 @@ export default function RequestStatus() {
 
   const isAnalyzing = request?.status === 'pending' || request?.status === 'analyzing';
   const isCompleted = request?.status === 'completed';
+  const needsClarification = request?.status === 'needs_clarification';
+  const followUpCount = request?.followUpCount || 0;
+
+  const handleSubmitAnswer = async () => {
+    if (!answer.trim() || !requestId) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`/api/custom-requests/${requestId}/answer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answer: answer.trim() })
+      });
+      if (res.ok) {
+        setAnswer("");
+        // Re-trigger analysis
+        await analyzeMutation.mutateAsync(requestId);
+        // Refresh data
+        queryClient.invalidateQueries({ queryKey: ['custom-request', requestId] });
+      }
+    } catch (err) {
+      console.error('Failed to submit answer:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const downloadFile = (filename: string, content: string) => {
     const element = document.createElement("a");
@@ -77,12 +106,17 @@ export default function RequestStatus() {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
                     </div>
-                    <span className="font-semibold text-primary">AI is Analyzing...</span>
+                    <span className="font-semibold text-primary">AI анализирует...</span>
+                  </>
+                ) : needsClarification ? (
+                  <>
+                    <MessageCircle size={24} className="text-accent" />
+                    <span className="font-semibold text-accent">Нужно уточнение (вопрос {followUpCount}/3)</span>
                   </>
                 ) : (
                   <>
                     <CheckCircle2 size={24} className="text-green-500" />
-                    <span className="font-semibold text-green-700">Analysis Complete</span>
+                    <span className="font-semibold text-green-700">Анализ завершён</span>
                   </>
                 )}
               </div>
@@ -143,7 +177,67 @@ export default function RequestStatus() {
                 </div>
 
                 <div className="relative z-10">
-                  {isAnalyzing ? (
+                  {needsClarification ? (
+                    <div className="py-8">
+                      <div className="mb-6 p-6 bg-accent/10 border border-accent/20 rounded-2xl">
+                        <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                          <MessageCircle size={20} className="text-accent" />
+                          Уточняющий вопрос от AI:
+                        </h3>
+                        <p className="text-slate-300 text-lg leading-relaxed">
+                          {request.lastQuestion || "Можете рассказать подробнее о ваших задачах?"}
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <textarea
+                          value={answer}
+                          onChange={(e) => setAnswer(e.target.value)}
+                          placeholder="Ваш ответ..."
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 resize-none"
+                          rows={4}
+                        />
+                        <button
+                          onClick={handleSubmitAnswer}
+                          disabled={!answer.trim() || isSubmitting || analyzeMutation.isPending}
+                          className="w-full py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all"
+                        >
+                          {isSubmitting || analyzeMutation.isPending ? (
+                            <>
+                              <Loader2 size={18} className="animate-spin" />
+                              Отправка...
+                            </>
+                          ) : (
+                            <>
+                              <Send size={18} />
+                              Отправить ответ
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      
+                      {followUpCount >= 2 && (
+                        <div className="mt-6 p-4 bg-primary/10 border border-primary/20 rounded-xl">
+                          <div className="flex items-start gap-3">
+                            <Headphones size={20} className="text-primary flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-sm text-slate-300">
+                                Устали отвечать на вопросы? 
+                              </p>
+                              <a 
+                                href="https://t.me/your_support" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-sm text-primary hover:underline font-medium"
+                              >
+                                Получите бесплатную консультацию →
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : isAnalyzing ? (
                     <div className="flex flex-col items-center justify-center py-20">
                       <div className="w-24 h-24 relative mb-8">
                         <div className="absolute inset-0 border-t-4 border-primary rounded-full animate-spin"></div>

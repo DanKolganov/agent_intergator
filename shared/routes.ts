@@ -137,6 +137,19 @@ export const api = {
         500: errorSchemas.internal,
       },
     },
+    answer: {
+      method: 'POST' as const,
+      path: '/api/custom-requests/:id/answer' as const,
+      input: z.object({
+        answer: z.string().min(1),
+      }),
+      responses: {
+        200: z.custom<typeof customAgentRequests.$inferSelect>(),
+        400: errorSchemas.validation,
+        404: errorSchemas.notFound,
+        500: errorSchemas.internal,
+      },
+    },
   },
   viewHistory: {
     record: {
