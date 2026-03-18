@@ -47,10 +47,10 @@ export default function CustomRequest() {
                 <Sparkles size={32} />
               </div>
               <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900 mb-3">
-                Request Custom Agent
+                Заказать кастомного агента
               </h1>
               <p className="text-slate-600 text-lg">
-                Tell us about your business. Our AI will analyze your needs and recommend the perfect custom agent architecture.
+                Расскажите о бизнесе. AI проанализирует потребности и предложит архитектуру подходящего агента.
               </p>
             </div>
 
@@ -58,14 +58,14 @@ export default function CustomRequest() {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                   <Building2 size={16} className="text-slate-400" />
-                  Business Name
+                  Название бизнеса
                 </label>
                 <input
                   type="text"
                   required
                   value={formData.businessName}
                   onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  placeholder="e.g. Acme Corp"
+                  placeholder="Например: Acme Corp"
                   className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 text-slate-900 placeholder:text-slate-400"
                 />
               </div>
@@ -73,14 +73,14 @@ export default function CustomRequest() {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                   <FileText size={16} className="text-slate-400" />
-                  Business Needs & Challenges
+                  Потребности и задачи
                 </label>
                 <textarea
                   required
                   rows={5}
                   value={formData.businessNeeds}
                   onChange={(e) => setFormData({ ...formData, businessNeeds: e.target.value })}
-                  placeholder="Describe your workflows, pain points, and what you'd like to automate..."
+                  placeholder="Опишите процессы, боли и что хотите автоматизировать..."
                   className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 text-slate-900 placeholder:text-slate-400 resize-none"
                 />
               </div>
@@ -91,10 +91,10 @@ export default function CustomRequest() {
                 className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 active:translate-y-0 active:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 mt-4"
               >
                 {createMutation.isPending ? (
-                  "Submitting..."
+                  "Отправляем..."
                 ) : (
                   <>
-                    Analyze My Needs
+                    Проанализировать
                     <ArrowRight size={20} />
                   </>
                 )}
@@ -103,7 +103,7 @@ export default function CustomRequest() {
             
             {createMutation.isError && (
               <div className="mt-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100">
-                {createMutation.error.message || "Something went wrong. Please try again."}
+                {createMutation.error.message || "Что-то пошло не так. Попробуйте ещё раз."}
               </div>
             )}
             

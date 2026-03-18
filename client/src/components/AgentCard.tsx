@@ -1,4 +1,4 @@
-import { ArrowRight, Briefcase, Zap, Tag } from "lucide-react";
+import { ArrowRight, Briefcase, Zap, Tag, CheckCircle2 } from "lucide-react";
 import type { Agent } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation } from "@tanstack/react-query";
@@ -25,6 +25,22 @@ export function AgentCard({ agent, onTagClick }: AgentCardProps) {
   const { isAuthenticated } = useAuth();
   const recordView = useRecordView();
   const fallbackImage = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop";
+
+  // Parse description to extract bullet points
+  const parseDescription = (description: string) => {
+    const lines = description.split('\n').filter(line => line.trim());
+    const mainDescription = lines[0] || '';
+    const bulletPoints = lines.slice(1).filter(line => 
+      line.trim().startsWith('•') || 
+      line.trim().startsWith('-') || 
+      line.trim().startsWith('*') ||
+      line.trim().match(/^\d+\./)
+    ).map(line => line.trim().replace(/^[•\-\*\d\.]\s*/, ''));
+    
+    return { mainDescription, bulletPoints };
+  };
+
+  const { mainDescription, bulletPoints } = parseDescription(agent.description);
 
   const handleClick = () => {
     if (isAuthenticated) {
@@ -71,9 +87,27 @@ export function AgentCard({ agent, onTagClick }: AgentCardProps) {
           </div>
         </div>
 
-        <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-grow line-clamp-3">
-          {agent.description}
+        <p className="text-slate-600 text-sm leading-relaxed mb-3 flex-grow">
+          {mainDescription}
         </p>
+
+        {bulletPoints.length > 0 && (
+          <div className="mb-4">
+            <ul className="space-y-2">
+              {bulletPoints.slice(0, 3).map((point, index) => (
+                <li key={index} className="flex items-start gap-2 text-xs text-slate-600">
+                  <CheckCircle2 size={12} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>{point}</span>
+                </li>
+              ))}
+              {bulletPoints.length > 3 && (
+                <li className="text-xs text-primary font-medium">
+                  +{bulletPoints.length - 3} еще...
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
 
         {agent.tags && agent.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">

@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, varchar, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, varchar, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
@@ -36,6 +36,23 @@ export const viewHistory = pgTable("view_history", {
   viewedAt: timestamp("viewed_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
+export const knowledgeBase = pgTable("knowledge_base", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  sourceUrl: text("source_url"),
+  tags: text("tags").array().default([]).notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const llmUsage = pgTable("llm_usage", {
+  id: serial("id").primaryKey(),
+  subjectId: varchar("subject_id").notNull(), // user sub or session id
+  count: integer("count").notNull().default(0),
+  periodStart: timestamp("period_start").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
 export const insertAgentSchema = createInsertSchema(agents).omit({ id: true, createdAt: true });
 export const insertCustomAgentRequestSchema = createInsertSchema(customAgentRequests).omit({
   id: true,
@@ -45,9 +62,22 @@ export const insertCustomAgentRequestSchema = createInsertSchema(customAgentRequ
   generatedCode: true,
   generatedReadme: true,
 });
+export const insertKnowledgeBaseSchema = createInsertSchema(knowledgeBase).omit({
+  id: true,
+  createdAt: true,
+});
+export const insertLlmUsageSchema = createInsertSchema(llmUsage).omit({
+  id: true,
+  periodStart: true,
+  updatedAt: true,
+});
 
 export type Agent = typeof agents.$inferSelect;
 export type InsertAgent = z.infer<typeof insertAgentSchema>;
 export type CustomAgentRequest = typeof customAgentRequests.$inferSelect;
 export type InsertCustomAgentRequest = z.infer<typeof insertCustomAgentRequestSchema>;
 export type ViewHistory = typeof viewHistory.$inferSelect;
+export type KnowledgeBaseDoc = typeof knowledgeBase.$inferSelect;
+export type InsertKnowledgeBaseDoc = z.infer<typeof insertKnowledgeBaseSchema>;
+export type LlmUsage = typeof llmUsage.$inferSelect;
+export type InsertLlmUsage = z.infer<typeof insertLlmUsageSchema>;

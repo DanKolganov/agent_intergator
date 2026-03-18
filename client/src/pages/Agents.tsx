@@ -1,46 +1,131 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { AgentCard } from "@/components/AgentCard";
 import { useAgents } from "@/hooks/use-agents";
 import { useAuth } from "@/hooks/use-auth";
-import { Search, Star, Globe, Plus, X } from "lucide-react";
+import { useLocation } from "wouter";
+import { Search, Star, Globe, Plus, X, Sparkles, Users, TrendingUp, DollarSign, HeadphonesIcon, ShoppingCart, MessageSquare } from "lucide-react";
 import AddAgentModal from "@/components/AddAgentModal";
+import { AgentAssistantPanel } from "@/components/AgentAssistantPanel";
 
 type Tab = "all" | "team";
+type BrowseMode = "directory" | "ai";
+type BusinessType = "all" | "hospitality" | "restaurant" | "retail" | "rental" | "service";
+type PainPoint = "all" | "customers" | "marketing" | "finance" | "hr" | "operations";
 
 export default function Agents() {
   const { data: agents, isLoading, error } = useAgents();
   const { isAuthenticated } = useAuth();
+  const [location] = useLocation();
 
   const [tab, setTab] = useState<Tab>("all");
+  const [browseMode, setBrowseMode] = useState<BrowseMode>("directory");
+  const [businessType, setBusinessType] = useState<BusinessType>("all");
+  const [painPoint, setPainPoint] = useState<PainPoint>("all");
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addInitial, setAddInitial] = useState<any>(null);
+
+  // Business type mappings
+  const businessTypeMapping = {
+    all: "Все типы бизнеса",
+    hospitality: "Гостиничный бизнес",
+    restaurant: "Рестораны и кафе",
+    retail: "Розничная торговля",
+    rental: "Арендный бизнес",
+    service: "Сервисные услуги"
+  };
+
+  // Pain point mappings
+  const painPointMapping = {
+    all: "Все задачи",
+    customers: "Работа с клиентами",
+    marketing: "Маркетинг",
+    finance: "Финансы",
+    hr: "HR и персонал",
+    operations: "Операционная деятельность"
+  };
+
+  // Handle URL parameters for pre-filtering
+  useEffect(() => {
+    const params = new URLSearchParams(location.split('?')[1] || '');
+    const business = params.get('business') as BusinessType;
+    const task = params.get('task') as PainPoint;
+    
+    if (business && Object.keys(businessTypeMapping).includes(business)) {
+      setBusinessType(business);
+    }
+    if (task && Object.keys(painPointMapping).includes(task)) {
+      setPainPoint(task);
+    }
+  }, [location]);
 
   const allTags = useMemo(() => {
     if (!agents) return [];
     const tagSet = new Set<string>();
-    agents.forEach(a => a.tags?.forEach(t => tagSet.add(t)));
+    agents.forEach((a) => a.tags?.forEach((t) => tagSet.add(t)));
     return Array.from(tagSet).sort();
   }, [agents]);
 
+  // Filter logic
   const filtered = useMemo(() => {
     if (!agents) return [];
     return agents.filter(agent => {
       if (tab === "team" && !agent.isTeamSolution) return false;
       if (tab === "all" && agent.isTeamSolution) return false;
+      
       if (search && !agent.name.toLowerCase().includes(search.toLowerCase()) &&
           !agent.description.toLowerCase().includes(search.toLowerCase()) &&
           !agent.industry.toLowerCase().includes(search.toLowerCase())) return false;
+      
       if (selectedTags.length > 0 && !selectedTags.every(t => agent.tags?.includes(t))) return false;
+      
+      // Business type filtering
+      if (businessType !== "all") {
+        const businessKeywords = {
+          hospitality: ["отель", "гостиница", "хостел", "апартаменты", "бронирование"],
+          restaurant: ["ресторан", "кафе", "бар", "столовая", "еда", "кухня"],
+          retail: ["магазин", "товар", "продажа", "торговля", "продукты"],
+          rental: ["аренда", "прокат", "имущество", "жилье", "транспорт"],
+          service: ["услуга", "сервис", "консультация", "ремонт", "помощь"]
+        };
+        const keywords = businessKeywords[businessType];
+        const hasBusinessType = keywords.some(keyword => 
+          agent.name.toLowerCase().includes(keyword) ||
+          agent.description.toLowerCase().includes(keyword) ||
+          agent.industry.toLowerCase().includes(keyword) ||
+          agent.tags?.some(tag => tag.toLowerCase().includes(keyword))
+        );
+        if (!hasBusinessType) return false;
+      }
+      
+      // Pain point filtering
+      if (painPoint !== "all") {
+        const painKeywords = {
+          customers: ["клиент", "покупатель", "обслуживание", "поддержка", "общение"],
+          marketing: ["маркетинг", "реклама", "продвижение", "контент", "seo", "соцсети"],
+          finance: ["финансы", "деньги", "бюджет", "отчетность", "аналитика", "налоги"],
+          hr: ["персонал", "сотрудник", "кадры", "найм", "обучение", "адаптация"],
+          operations: ["операции", "процессы", "автоматизация", "документы", "учет"]
+        };
+        const keywords = painKeywords[painPoint];
+        const hasPainPoint = keywords.some(keyword => 
+          agent.name.toLowerCase().includes(keyword) ||
+          agent.description.toLowerCase().includes(keyword) ||
+          agent.tags?.some(tag => tag.toLowerCase().includes(keyword))
+        );
+        if (!hasPainPoint) return false;
+      }
+      
       return true;
     });
-  }, [agents, tab, search, selectedTags]);
+  }, [agents, tab, search, selectedTags, businessType, painPoint]);
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
     );
   };
 
@@ -50,15 +135,15 @@ export default function Agents() {
 
       <main className="flex-grow pt-12 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div className="max-w-2xl">
               <h1 className="text-4xl font-bold font-display text-slate-900 mb-3">
-                Agent Directory
+                Бесплатные AI решения
               </h1>
               <p className="text-lg text-slate-600">
-                Browse specialized AI agents designed to automate and elevate your business.
+                Подбирайте бесплатные AI-инструменты для автоматизации и роста
+                вашего бизнеса.
               </p>
             </div>
 
@@ -70,7 +155,7 @@ export default function Agents() {
                   data-testid="button-add-agent"
                 >
                   <Plus size={16} />
-                  Add Agent
+                  Добавить агента
                 </button>
               )}
               <div className="relative w-full md:w-72">
@@ -80,8 +165,8 @@ export default function Agents() {
                 <input
                   type="text"
                   value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Search agents..."
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Поиск по агентам..."
                   className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all shadow-sm"
                   data-testid="input-search"
                 />
@@ -97,7 +182,7 @@ export default function Agents() {
               data-testid="tab-all"
             >
               <Globe size={15} />
-              Browse Agents
+              Агент-маркет
             </button>
             <button
               onClick={() => setTab("team")}
@@ -105,99 +190,194 @@ export default function Agents() {
               data-testid="tab-team"
             >
               <Star size={15} />
-              Our Solutions
+              Наши решения
             </button>
           </div>
 
-          {/* Tag filter */}
-          {allTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-8">
-              {allTags.map(tag => (
+          {/* Business Type Filter */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">Тип бизнеса</h3>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(businessTypeMapping).map(([key, label]) => (
                 <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-                    selectedTags.includes(tag)
+                  key={key}
+                  onClick={() => setBusinessType(key as BusinessType)}
+                  className={`px-4 py-2 rounded-xl font-medium text-sm transition-all border ${
+                    businessType === key
                       ? "bg-primary text-white border-primary shadow-sm"
                       : "bg-white text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary"
                   }`}
-                  data-testid={`filter-tag-${tag}`}
                 >
-                  #{tag}
+                  {label}
                 </button>
               ))}
-              {selectedTags.length > 0 && (
+            </div>
+          </div>
+
+          {/* Pain Point Filter */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">Основные задачи</h3>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(painPointMapping).map(([key, label]) => (
                 <button
-                  onClick={() => setSelectedTags([])}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium text-red-500 border border-red-200 bg-red-50 hover:bg-red-100 transition-colors flex items-center gap-1"
+                  key={key}
+                  onClick={() => setPainPoint(key as PainPoint)}
+                  className={`px-4 py-2 rounded-xl font-medium text-sm transition-all border ${
+                    painPoint === key
+                      ? "bg-accent text-white border-accent shadow-sm"
+                      : "bg-white text-slate-600 border-slate-200 hover:border-accent/40 hover:text-accent"
+                  }`}
                 >
-                  <X size={11} /> Clear
+                  {label}
                 </button>
-              )}
+              ))}
+            </div>
+          </div>
+
+          {/* Browse sub-tabs (only for directory tab) */}
+          {tab === "all" && (
+            <div className="flex gap-1 p-1 bg-slate-100 border border-slate-200 rounded-2xl w-fit mb-6">
+              <button
+                onClick={() => setBrowseMode("directory")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all ${
+                  browseMode === "directory"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Globe size={14} />
+                Каталог
+              </button>
+              <button
+                onClick={() => setBrowseMode("ai")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all ${
+                  browseMode === "ai"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Sparkles size={14} />
+                Бесплатные решения
+              </button>
             </div>
           )}
 
-          {/* Grid */}
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm animate-pulse">
-                  <div className="aspect-[16/9] bg-slate-200 rounded-2xl mb-6" />
-                  <div className="h-6 bg-slate-200 rounded-md w-2/3 mb-4" />
-                  <div className="h-4 bg-slate-200 rounded-md w-1/3 mb-6" />
-                  <div className="space-y-2 mb-8">
-                    <div className="h-3 bg-slate-100 rounded-md w-full" />
-                    <div className="h-3 bg-slate-100 rounded-md w-4/5" />
-                  </div>
-                  <div className="h-10 bg-slate-100 rounded-xl w-full" />
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-center py-24 bg-white rounded-3xl border border-red-100">
-              <p className="text-red-500 font-medium">Failed to load agents. Please try again.</p>
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="text-center py-24 bg-white rounded-3xl border border-slate-100">
-              <p className="text-slate-500 font-medium text-lg mb-2">
-                {tab === "team" ? "No team solutions yet." : "No agents match your filters."}
-              </p>
-              {tab === "team" && isAuthenticated && (
-                <button
-                  onClick={() => setShowAddModal(true)}
-                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm"
-                >
-                  <Plus size={16} /> Add First Solution
-                </button>
-              )}
-            </div>
+          {tab === "all" && browseMode === "ai" ? (
+            <AgentAssistantPanel
+              agents={agents}
+              onOpenAddModal={(initial) => {
+                setAddInitial(initial);
+                setShowAddModal(true);
+              }}
+            />
           ) : (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={tab + selectedTags.join() + search}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-              >
-                {filtered.map((agent, index) => (
+            <>
+              {/* Tag filter */}
+              {allTags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {allTags.map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                        selectedTags.includes(tag)
+                          ? "bg-primary text-white border-primary shadow-sm"
+                          : "bg-white text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary"
+                      }`}
+                      data-testid={`filter-tag-${tag}`}
+                    >
+                      #{tag}
+                    </button>
+                  ))}
+                  {selectedTags.length > 0 && (
+                    <button
+                      onClick={() => setSelectedTags([])}
+                      className="px-3 py-1.5 rounded-full text-xs font-medium text-red-500 border border-red-200 bg-red-50 hover:bg-red-100 transition-colors flex items-center gap-1"
+                    >
+                      <X size={11} /> Clear
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Grid */}
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm animate-pulse"
+                    >
+                      <div className="aspect-[16/9] bg-slate-200 rounded-2xl mb-6" />
+                      <div className="h-6 bg-slate-200 rounded-md w-2/3 mb-4" />
+                      <div className="h-4 bg-slate-200 rounded-md w-1/3 mb-6" />
+                      <div className="space-y-2 mb-8">
+                        <div className="h-3 bg-slate-100 rounded-md w-full" />
+                        <div className="h-3 bg-slate-100 rounded-md w-4/5" />
+                      </div>
+                      <div className="h-10 bg-slate-100 rounded-xl w-full" />
+                    </div>
+                  ))}
+                </div>
+              ) : error ? (
+                <div className="text-center py-24 bg-white rounded-3xl border border-red-100">
+                  <p className="text-red-500 font-medium">
+                    Не удалось загрузить агентов. Попробуйте ещё раз.
+                  </p>
+                </div>
+              ) : filtered.length === 0 ? (
+                <div className="text-center py-24 bg-white rounded-3xl border border-slate-100">
+                  <p className="text-slate-500 font-medium text-lg mb-2">
+                    {tab === "team"
+                      ? "Пока нет наших решений."
+                      : "Ничего не найдено по фильтрам."}
+                  </p>
+                  {tab === "team" && isAuthenticated && (
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm"
+                    >
+                      <Plus size={16} /> Добавить первое решение
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <AnimatePresence mode="wait">
                   <motion.div
-                    key={agent.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    key={tab + selectedTags.join() + search}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.07 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                   >
-                    <AgentCard agent={agent} onTagClick={toggleTag} />
+                    {filtered.map((agent, index) => (
+                      <motion.div
+                        key={agent.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.07 }}
+                      >
+                        <AgentCard agent={agent} onTagClick={toggleTag} />
+                      </motion.div>
+                    ))}
                   </motion.div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
+                </AnimatePresence>
+              )}
+            </>
           )}
         </div>
       </main>
 
-      {showAddModal && <AddAgentModal onClose={() => setShowAddModal(false)} />}
+      {showAddModal && (
+        <AddAgentModal
+          initial={addInitial || undefined}
+          onClose={() => {
+            setShowAddModal(false);
+            setAddInitial(null);
+          }}
+        />
+      )}
     </div>
   );
 }

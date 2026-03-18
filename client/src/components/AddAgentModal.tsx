@@ -7,20 +7,29 @@ import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   onClose: () => void;
+  initial?: Partial<{
+    name: string;
+    description: string;
+    industry: string;
+    useCase: string;
+    imageUrl: string;
+    tags: string[];
+    isTeamSolution: boolean;
+  }>;
 }
 
-export default function AddAgentModal({ onClose }: Props) {
+export default function AddAgentModal({ onClose, initial }: Props) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [tagInput, setTagInput] = useState("");
   const [form, setForm] = useState({
-    name: "",
-    description: "",
-    industry: "",
-    useCase: "",
-    imageUrl: "",
-    tags: [] as string[],
-    isTeamSolution: true,
+    name: initial?.name ?? "",
+    description: initial?.description ?? "",
+    industry: initial?.industry ?? "",
+    useCase: initial?.useCase ?? "",
+    imageUrl: initial?.imageUrl ?? "",
+    tags: initial?.tags ?? ([] as string[]),
+    isTeamSolution: initial?.isTeamSolution ?? true,
   });
 
   const addAgent = useMutation({
@@ -36,11 +45,11 @@ export default function AddAgentModal({ onClose }: Props) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.agents.list.path] });
-      toast({ title: "Agent added!", description: "Your agent is now in the directory." });
+      toast({ title: "Агент добавлен", description: "Теперь он доступен в каталоге." });
       onClose();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to add agent. Make sure you're signed in.", variant: "destructive" });
+      toast({ title: "Ошибка", description: "Не удалось добавить агента. Проверьте, что вы вошли.", variant: "destructive" });
     },
   });
 
@@ -78,7 +87,7 @@ export default function AddAgentModal({ onClose }: Props) {
           className="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-y-auto max-h-[90vh]"
         >
           <div className="flex items-center justify-between p-6 border-b border-slate-100">
-            <h2 className="text-xl font-bold font-display text-slate-900">Add Agent</h2>
+            <h2 className="text-xl font-bold font-display text-slate-900">Добавить агента</h2>
             <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-100 transition-colors">
               <X size={18} className="text-slate-500" />
             </button>
@@ -86,10 +95,10 @@ export default function AddAgentModal({ onClose }: Props) {
 
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             {[
-              { label: "Agent Name", key: "name", placeholder: "e.g. Smart Invoice Bot" },
-              { label: "Industry", key: "industry", placeholder: "e.g. Finance" },
-              { label: "Use Case", key: "useCase", placeholder: "e.g. Accounting Automation" },
-              { label: "Image URL (optional)", key: "imageUrl", placeholder: "https://..." },
+              { label: "Название агента", key: "name", placeholder: "Например: Smart Invoice Bot" },
+              { label: "Отрасль", key: "industry", placeholder: "Например: Финансы" },
+              { label: "Сценарий", key: "useCase", placeholder: "Например: Автоматизация бухгалтерии" },
+              { label: "Картинка (URL, опционально)", key: "imageUrl", placeholder: "https://..." },
             ].map(({ label, key, placeholder }) => (
               <div key={key}>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">{label}</label>
@@ -105,10 +114,10 @@ export default function AddAgentModal({ onClose }: Props) {
             ))}
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Description</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Описание</label>
               <textarea
                 rows={3}
-                placeholder="What does this agent do?"
+                placeholder="Что делает этот агент?"
                 value={form.description}
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all resize-none"
@@ -117,14 +126,14 @@ export default function AddAgentModal({ onClose }: Props) {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Tags</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Теги</label>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={tagInput}
                   onChange={e => setTagInput(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())}
-                  placeholder="Add tag, press Enter"
+                  placeholder="Введите тег и нажмите Enter"
                   className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
                   data-testid="input-tag"
                 />
@@ -160,7 +169,7 @@ export default function AddAgentModal({ onClose }: Props) {
                 className="w-4 h-4 accent-primary"
               />
               <label htmlFor="isTeam" className="text-sm font-medium text-amber-800 cursor-pointer">
-                Mark as "Our Solution" (visible in team tab)
+                Отметить как “Наше решение” (видно во вкладке “Наши решения”)
               </label>
             </div>
 
@@ -170,7 +179,7 @@ export default function AddAgentModal({ onClose }: Props) {
                 onClick={onClose}
                 className="flex-1 py-3 rounded-xl font-semibold text-sm text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors"
               >
-                Cancel
+                Отмена
               </button>
               <button
                 type="submit"
@@ -178,7 +187,7 @@ export default function AddAgentModal({ onClose }: Props) {
                 className="flex-1 py-3 rounded-xl font-semibold text-sm text-white bg-primary hover:bg-primary/90 transition-colors disabled:opacity-50"
                 data-testid="button-submit-agent"
               >
-                {addAgent.isPending ? "Adding..." : "Add Agent"}
+                {addAgent.isPending ? "Добавляем..." : "Добавить"}
               </button>
             </div>
           </form>

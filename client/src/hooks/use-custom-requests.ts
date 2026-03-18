@@ -9,7 +9,7 @@ export function useCustomRequest(id: number) {
       const url = buildUrl(api.customRequests.get.path, { id });
       const res = await fetch(url, { credentials: "include" });
       if (res.status === 404) return null;
-      if (!res.ok) throw new Error("Failed to fetch custom request");
+      if (!res.ok) throw new Error("Не удалось загрузить запрос");
       const data = await res.json();
       return api.customRequests.get.responses[200].parse(data);
     },
@@ -38,9 +38,9 @@ export function useCreateCustomRequest() {
       if (!res.ok) {
         if (res.status === 400) {
           const errorData = await res.json();
-          throw new Error(errorData.message || "Validation failed");
+          throw new Error(errorData.message || "Ошибка валидации");
         }
-        throw new Error("Failed to create custom request");
+        throw new Error("Не удалось создать запрос");
       }
       
       const responseData = await res.json();
@@ -64,7 +64,7 @@ export function useAnalyzeCustomRequest() {
       });
       
       if (!res.ok) {
-        throw new Error("Analysis failed to start");
+        throw new Error("Не удалось запустить анализ");
       }
       
       const responseData = await res.json();

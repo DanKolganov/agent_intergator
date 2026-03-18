@@ -9,7 +9,7 @@
     --font-sans: 'Inter', sans-serif;
     --font-display: 'Plus Jakarta Sans', sans-serif;
 
-    /* Clean, Professional Business Palette */
+    /* Modern Teal + Indigo Palette */
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     
@@ -19,7 +19,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
     
-    --primary: 239 84% 67%; /* Vibrant Indigo */
+    --primary: 172 66% 45%; /* Teal */
     --primary-foreground: 210 40% 98%;
     
     --secondary: 214 32% 91%;
@@ -28,7 +28,7 @@
     --muted: 214 32% 91%;
     --muted-foreground: 215 16% 47%;
     
-    --accent: 280 84% 63%; /* Deep Purple Accent */
+    --accent: 221 83% 53%; /* Indigo */
     --accent-foreground: 210 40% 98%;
     
     --destructive: 0 84% 60%;
@@ -36,7 +36,7 @@
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 239 84% 67%;
+    --ring: 172 66% 45%;
 
     --radius: 1rem;
   }
@@ -62,7 +62,7 @@
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-pink-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-cyan-400;
   }
 
   .bg-grid-pattern {
@@ -84,8 +84,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 1; box-shadow: 0 0 20px 0px rgba(99, 102, 241, 0.4); }
-  50% { opacity: .8; box-shadow: 0 0 40px 10px rgba(99, 102, 241, 0.6); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 20px 0px rgba(20, 184, 166, 0.35); }
+  50% { opacity: .82; box-shadow: 0 0 40px 10px rgba(20, 184, 166, 0.55); }
 }
 
 .animate-pulse-glow {

@@ -11,7 +11,7 @@ function useViewHistory() {
     queryKey: [api.viewHistory.list.path],
     queryFn: async () => {
       const res = await fetch(api.viewHistory.list.path, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch history");
+      if (!res.ok) throw new Error("Не удалось загрузить историю");
       return res.json();
     },
     enabled: true,
@@ -32,22 +32,22 @@ export default function History() {
             <Clock size={20} className="text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold font-display text-slate-900">Viewing History</h1>
-            <p className="text-slate-500 text-sm">Agents you've recently browsed</p>
+            <h1 className="text-3xl font-bold font-display text-slate-900">История просмотров</h1>
+            <p className="text-slate-500 text-sm">Агенты, которых вы недавно смотрели</p>
           </div>
         </div>
 
         {!authLoading && !isAuthenticated ? (
           <div className="text-center py-32 bg-white rounded-3xl border border-slate-100">
             <LogIn size={48} className="text-slate-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-slate-700 mb-2">Sign in to see your history</h2>
-            <p className="text-slate-500 mb-6">We save your browsing history when you're logged in.</p>
+            <h2 className="text-xl font-semibold text-slate-700 mb-2">Войдите, чтобы увидеть историю</h2>
+            <p className="text-slate-500 mb-6">Мы сохраняем историю, когда вы авторизованы.</p>
             <a
               href="/api/login"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
             >
               <LogIn size={16} />
-              Sign In
+              Войти
             </a>
           </div>
         ) : isLoading ? (
@@ -59,7 +59,7 @@ export default function History() {
         ) : !agents || agents.length === 0 ? (
           <div className="text-center py-32 bg-white rounded-3xl border border-slate-100">
             <Clock size={48} className="text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500 font-medium text-lg">No history yet. Start browsing agents!</p>
+            <p className="text-slate-500 font-medium text-lg">Пока пусто. Начните просматривать агентов!</p>
           </div>
         ) : (
           <motion.div

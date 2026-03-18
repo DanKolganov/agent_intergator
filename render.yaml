@@ -18,6 +18,10 @@ services:
         from: env
       - key: AI_INTEGRATIONS_OPENAI_API_KEY
         from: env
+      - key: AI_INTEGRATIONS_OPENAI_BASE_URL
+        from: env
+      - key: AI_INTEGRATIONS_MODEL
+        from: env
       - key: FRONTEND_ORIGIN
         from: env
 

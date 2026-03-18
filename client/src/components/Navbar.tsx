@@ -44,13 +44,13 @@ export function Navbar() {
                 <Bot size={24} strokeWidth={2.5} />
               </div>
               <span className="font-display font-bold text-xl tracking-tight text-slate-900">
-                Agent<span className="text-primary">Directory</span>
+                Каталог<span className="text-primary">Агентов</span>
               </span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-2">
-              <NavLink href="/agents">Browse Agents</NavLink>
-              {isAuthenticated && <NavLink href="/history">My History</NavLink>}
+              <NavLink href="/agents">Агенты</NavLink>
+              {isAuthenticated && <NavLink href="/history">История</NavLink>}
             </nav>
           </div>
 
@@ -60,7 +60,7 @@ export function Navbar() {
               className="group relative inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-slate-900 rounded-full hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none"
             >
               <Sparkles size={15} className="text-accent group-hover:animate-pulse" />
-              <span>Custom Agent</span>
+              <span>Кастомный агент</span>
             </Link>
 
             {isAuthenticated ? (
@@ -85,7 +85,7 @@ export function Navbar() {
                   data-testid="button-logout"
                 >
                   <LogOut size={14} />
-                  <span className="hidden sm:block">Exit</span>
+                  <span className="hidden sm:block">Выйти</span>
                 </button>
               </div>
             ) : (
@@ -95,7 +95,7 @@ export function Navbar() {
                 data-testid="button-login"
               >
                 <LogIn size={15} />
-                Sign In
+                Войти
               </a>
             )}
           </div>
