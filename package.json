@@ -5,11 +5,12 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "tsx script/build.ts",
+    "build": "tsx script/build.ts && npm run update:agents",
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "db:push": "drizzle-kit push",
-    "kb:import": "tsx script/import_kb.ts"
+    "kb:import": "tsx script/import_kb.ts",
+    "update:agents": "node scripts/update-agents-on-deploy.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
