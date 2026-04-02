@@ -1,5 +1,5 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import pg from "pg";
 import * as schema from "@shared/schema";
 
@@ -11,10 +11,10 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-const connectionString = process.env.DATABASE_URL!; 
+const connectionString = process.env.DATABASE_URL!;
 
-const client = postgres(connectionString, { 
-  ssl: 'require'  // или { rejectUnauthorized: true } для проверки
+const client = postgres(connectionString, {
+  ssl: { rejectUnauthorized: false }, // Для Supabase
 });
 
 export const db = drizzle(client);
@@ -26,7 +26,6 @@ export const db = drizzle(client);
 // - PGSSLMODE=no-verify  OR
 // - DB_SSL_NO_VERIFY=true
 // This will set `ssl.rejectUnauthorized = false` for the PG pool.
-
 
 // const poolConfig: any = { connectionString: process.env.DATABASE_URL };
 // const noVerify =
