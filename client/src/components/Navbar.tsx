@@ -4,19 +4,26 @@ import { motion } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useAuth } from "@/hooks/use-auth";
+import ThemeToggle from "./ThemeToggle";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
   const [isActive] = useRoute(href);
   return (
     <Link
       href={href}
       className={cn(
         "relative px-4 py-2 text-sm font-medium transition-colors",
-        isActive ? "text-primary" : "text-slate-600 hover:text-slate-900"
+        isActive ? "text-primary" : "text-slate-600 hover:text-slate-900",
       )}
     >
       {children}
@@ -35,15 +42,18 @@ export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/20 glass-panel bg-white/70 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-white/20 dark:border-slate-700/50 glass-panel dark:glass-panel-dark bg-white/70 dark:bg-slate-900/70 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2 group cursor-pointer">
+            <Link
+              href="/"
+              className="flex items-center gap-2 group cursor-pointer"
+            >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300 group-hover:scale-105">
                 <Bot size={24} strokeWidth={2.5} />
               </div>
-              <span className="font-display font-bold text-xl tracking-tight text-slate-900">
+              <span className="font-display font-bold text-xl tracking-tight text-slate-900 dark:text-slate-100">
                 Каталог<span className="text-primary">Агентов</span>
               </span>
             </Link>
@@ -55,11 +65,15 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link
               href="/custom"
               className="group relative inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-slate-900 rounded-full hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none"
             >
-              <Sparkles size={15} className="text-accent group-hover:animate-pulse" />
+              <Sparkles
+                size={15}
+                className="text-accent group-hover:animate-pulse"
+              />
               <span>Кастомный агент</span>
             </Link>
 

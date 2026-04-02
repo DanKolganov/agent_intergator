@@ -10,8 +10,20 @@ import AddAgentModal from "@/components/AddAgentModal";
 import { AgentAssistantPanel } from "@/components/AgentAssistantPanel";
 
 type Tab = "find" | "free" | "team";
-type BusinessType = "all" | "hospitality" | "restaurant" | "retail" | "rental" | "service";
-type PainPoint = "all" | "customers" | "marketing" | "finance" | "hr" | "operations";
+type BusinessType =
+  | "all"
+  | "hospitality"
+  | "restaurant"
+  | "retail"
+  | "rental"
+  | "service";
+type PainPoint =
+  | "all"
+  | "customers"
+  | "marketing"
+  | "finance"
+  | "hr"
+  | "operations";
 
 export default function Agents() {
   const { data: agents, isLoading, error } = useAgents();
@@ -32,7 +44,7 @@ export default function Agents() {
     restaurant: "Рестораны и кафе",
     retail: "Розничная торговля",
     rental: "Арендный бизнес",
-    service: "Сервисные услуги"
+    service: "Сервисные услуги",
   };
 
   const painPointMapping = {
@@ -41,14 +53,14 @@ export default function Agents() {
     marketing: "Маркетинг",
     finance: "Финансы",
     hr: "HR и персонал",
-    operations: "Операционная деятельность"
+    operations: "Операционная деятельность",
   };
 
   useEffect(() => {
-    const params = new URLSearchParams(location.split('?')[1] || '');
-    const business = params.get('business') as BusinessType;
-    const task = params.get('task') as PainPoint;
-    
+    const params = new URLSearchParams(location.split("?")[1] || "");
+    const business = params.get("business") as BusinessType;
+    const task = params.get("task") as PainPoint;
+
     if (business && Object.keys(businessTypeMapping).includes(business)) {
       setBusinessType(business);
       setTab("free");
@@ -68,51 +80,100 @@ export default function Agents() {
 
   const filtered = useMemo(() => {
     if (!agents) return [];
-    return agents.filter(agent => {
+    return agents.filter((agent) => {
       if (tab === "team" && !agent.isTeamSolution) return false;
       if (tab === "free" && agent.isTeamSolution) return false;
-      
-      if (search && !agent.name.toLowerCase().includes(search.toLowerCase()) &&
-          !agent.description.toLowerCase().includes(search.toLowerCase()) &&
-          !agent.industry.toLowerCase().includes(search.toLowerCase())) return false;
-      
-      if (selectedTags.length > 0 && !selectedTags.every(t => agent.tags?.includes(t))) return false;
-      
+
+      if (
+        search &&
+        !agent.name.toLowerCase().includes(search.toLowerCase()) &&
+        !agent.description.toLowerCase().includes(search.toLowerCase()) &&
+        !agent.industry.toLowerCase().includes(search.toLowerCase())
+      )
+        return false;
+
+      if (
+        selectedTags.length > 0 &&
+        !selectedTags.every((t) => agent.tags?.includes(t))
+      )
+        return false;
+
       if (businessType !== "all") {
         const businessKeywords = {
-          hospitality: ["отель", "гостиница", "хостел", "апартаменты", "бронирование"],
+          hospitality: [
+            "отель",
+            "гостиница",
+            "хостел",
+            "апартаменты",
+            "бронирование",
+          ],
           restaurant: ["ресторан", "кафе", "бар", "столовая", "еда", "кухня"],
           retail: ["магазин", "товар", "продажа", "торговля", "продукты"],
           rental: ["аренда", "прокат", "имущество", "жилье", "транспорт"],
-          service: ["услуга", "сервис", "консультация", "ремонт", "помощь"]
+          service: ["услуга", "сервис", "консультация", "ремонт", "помощь"],
         };
         const keywords = businessKeywords[businessType];
-        const hasBusinessType = keywords.some(keyword => 
-          agent.name.toLowerCase().includes(keyword) ||
-          agent.description.toLowerCase().includes(keyword) ||
-          agent.industry.toLowerCase().includes(keyword) ||
-          agent.tags?.some(tag => tag.toLowerCase().includes(keyword))
+        const hasBusinessType = keywords.some(
+          (keyword) =>
+            agent.name.toLowerCase().includes(keyword) ||
+            agent.description.toLowerCase().includes(keyword) ||
+            agent.industry.toLowerCase().includes(keyword) ||
+            agent.tags?.some((tag) => tag.toLowerCase().includes(keyword)),
         );
         if (!hasBusinessType) return false;
       }
-      
+
       if (painPoint !== "all") {
         const painKeywords = {
-          customers: ["клиент", "покупатель", "обслуживание", "поддержка", "общение"],
-          marketing: ["маркетинг", "реклама", "продвижение", "контент", "seo", "соцсети"],
-          finance: ["финансы", "деньги", "бюджет", "отчетность", "аналитика", "налоги"],
-          hr: ["персонал", "сотрудник", "кадры", "найм", "обучение", "адаптация"],
-          operations: ["операции", "процессы", "автоматизация", "документы", "учет"]
+          customers: [
+            "клиент",
+            "покупатель",
+            "обслуживание",
+            "поддержка",
+            "общение",
+          ],
+          marketing: [
+            "маркетинг",
+            "реклама",
+            "продвижение",
+            "контент",
+            "seo",
+            "соцсети",
+          ],
+          finance: [
+            "финансы",
+            "деньги",
+            "бюджет",
+            "отчетность",
+            "аналитика",
+            "налоги",
+          ],
+          hr: [
+            "персонал",
+            "сотрудник",
+            "кадры",
+            "найм",
+            "обучение",
+            "адаптация",
+          ],
+          operations: [
+            "операции",
+            "процессы",
+            "автоматизация",
+            "документы",
+            "учет",
+          ],
         };
         const keywords = painKeywords[painPoint];
-        const hasPainPoint = keywords.some(keyword => 
-          agent.name.toLowerCase().includes(keyword) ||
-          agent.description.toLowerCase().includes(keyword) ||
-          agent.tags?.some(tag => tag.toLowerCase().includes(keyword))
+        const hasPainPoint = keywords.some(
+          (keyword) =>
+            agent.name.toLowerCase().includes(keyword) ||
+            agent.description.toLowerCase().includes(keyword) ||
+            agent.tags?.some((tag) => tag.toLowerCase().includes(keyword)),
         );
         if (!hasPainPoint) return false;
       }
-      
+
       return true;
     });
   }, [agents, tab, search, selectedTags, businessType, painPoint]);
@@ -124,21 +185,24 @@ export default function Agents() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       <Navbar />
       <main className="flex-grow pt-12 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div className="max-w-2xl">
-              <h1 className="text-4xl font-bold font-display text-slate-900 mb-3">
+              <h1 className="text-4xl font-bold font-display text-slate-900 dark:text-slate-100 mb-3">
                 {tab === "find" && "Найти Агента"}
                 {tab === "free" && "Бесплатные AI решения"}
                 {tab === "team" && "Наши решения"}
               </h1>
-              <p className="text-lg text-slate-600">
-                {tab === "find" && "Опишите задачу — подберём идеального AI-агента для вашего бизнеса."}
-                {tab === "free" && "Подбирайте бесплатные AI-инструменты для автоматизации и роста вашего бизнеса."}
-                {tab === "team" && "Готовые решения от нашей команды для вашего бизнеса."}
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                {tab === "find" &&
+                  "Опишите задачу — подберём идеального AI-агента для вашего бизнеса."}
+                {tab === "free" &&
+                  "Подбирайте бесплатные AI-инструменты для автоматизации и роста вашего бизнеса."}
+                {tab === "team" &&
+                  "Готовые решения от нашей команды для вашего бизнеса."}
               </p>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -160,7 +224,7 @@ export default function Agents() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Поиск по агентам..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all shadow-sm"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -169,21 +233,21 @@ export default function Agents() {
           <div className="flex gap-1 p-1 bg-slate-200 rounded-2xl w-fit mb-8">
             <button
               onClick={() => setTab("find")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${tab === "find" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${tab === "find" ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"}`}
             >
               <Sparkles size={16} />
               Найти Агента
             </button>
             <button
               onClick={() => setTab("free")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${tab === "free" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${tab === "free" ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"}`}
             >
               <Globe size={16} />
               Бесплатные решения
             </button>
             <button
               onClick={() => setTab("team")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${tab === "team" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${tab === "team" ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"}`}
             >
               <Star size={16} />
               Наши решения
@@ -201,7 +265,9 @@ export default function Agents() {
           ) : tab === "free" ? (
             <>
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-slate-700 mb-3">Тип бизнеса</h3>
+                <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                  Тип бизнеса
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(businessTypeMapping).map(([key, label]) => (
                     <button
@@ -210,7 +276,7 @@ export default function Agents() {
                       className={`px-4 py-2 rounded-xl font-medium text-sm transition-all border ${
                         businessType === key
                           ? "bg-primary text-white border-primary shadow-sm"
-                          : "bg-white text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary"
+                          : "bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-primary/40 hover:text-primary"
                       }`}
                     >
                       {label}
@@ -219,7 +285,9 @@ export default function Agents() {
                 </div>
               </div>
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-slate-700 mb-3">Основные задачи</h3>
+                <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                  Основные задачи
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(painPointMapping).map(([key, label]) => (
                     <button
@@ -228,7 +296,7 @@ export default function Agents() {
                       className={`px-4 py-2 rounded-xl font-medium text-sm transition-all border ${
                         painPoint === key
                           ? "bg-accent text-white border-accent shadow-sm"
-                          : "bg-white text-slate-600 border-slate-200 hover:border-accent/40 hover:text-accent"
+                          : "bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-accent/40 hover:text-accent"
                       }`}
                     >
                       {label}
@@ -245,7 +313,7 @@ export default function Agents() {
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                         selectedTags.includes(tag)
                           ? "bg-primary text-white border-primary shadow-sm"
-                          : "bg-white text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary"
+                          : "bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-primary/40 hover:text-primary"
                       }`}
                     >
                       #{tag}
@@ -254,7 +322,7 @@ export default function Agents() {
                   {selectedTags.length > 0 && (
                     <button
                       onClick={() => setSelectedTags([])}
-                      className="px-3 py-1.5 rounded-full text-xs font-medium text-red-500 border border-red-200 bg-red-50 hover:bg-red-100 transition-colors flex items-center gap-1"
+                      className="px-3 py-1.5 rounded-full text-xs font-medium text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors flex items-center gap-1"
                     >
                       <X size={11} /> Clear
                     </button>
@@ -264,30 +332,43 @@ export default function Agents() {
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={i} className="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm animate-pulse">
-                      <div className="aspect-[16/9] bg-slate-200 rounded-2xl mb-6" />
-                      <div className="h-6 bg-slate-200 rounded-md w-2/3 mb-4" />
-                      <div className="h-4 bg-slate-200 rounded-md w-1/3 mb-6" />
+                    <div
+                      key={i}
+                      className="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm animate-pulse"
+                    >
+                      <div className="aspect-[16/9] bg-slate-200 dark:bg-slate-600 rounded-2xl mb-6" />
+                      <div className="h-6 bg-slate-200 dark:bg-slate-600 rounded-md w-2/3 mb-4" />
+                      <div className="h-4 bg-slate-200 dark:bg-slate-600 rounded-md w-1/3 mb-6" />
                       <div className="space-y-2 mb-8">
-                        <div className="h-3 bg-slate-100 rounded-md w-full" />
-                        <div className="h-3 bg-slate-100 rounded-md w-4/5" />
+                        <div className="h-3 bg-slate-100 dark:bg-slate-600 rounded-md w-full" />
+                        <div className="h-3 bg-slate-100 dark:bg-slate-600 rounded-md w-4/5" />
                       </div>
-                      <div className="h-10 bg-slate-100 rounded-xl w-full" />
+                      <div className="h-10 bg-slate-100 dark:bg-slate-600 rounded-xl w-full" />
                     </div>
                   ))}
                 </div>
               ) : error ? (
-                <div className="text-center py-24 bg-white rounded-3xl border border-red-100">
-                  <p className="text-red-500 font-medium">Не удалось загрузить агентов. Попробуйте ещё раз.</p>
+                <div className="text-center py-24 bg-white dark:bg-slate-800 rounded-3xl border border-red-100 dark:border-red-900/20">
+                  <p className="text-red-500 dark:text-red-400 font-medium">
+                    Не удалось загрузить агентов. Попробуйте ещё раз.
+                  </p>
                 </div>
               ) : filtered.length === 0 ? (
-                <div className="text-center py-24 bg-white rounded-3xl border border-slate-100">
-                  <p className="text-slate-500 font-medium text-lg mb-2">Ничего не найдено по фильтрам.</p>
+                <div className="text-center py-24 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
+                  <p className="text-slate-500 dark:text-slate-400 font-medium text-lg mb-2">
+                    Ничего не найдено по фильтрам.
+                  </p>
                 </div>
               ) : (
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={tab + selectedTags.join() + search + businessType + painPoint}
+                    key={
+                      tab +
+                      selectedTags.join() +
+                      search +
+                      businessType +
+                      painPoint
+                    }
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
@@ -313,25 +394,32 @@ export default function Agents() {
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm animate-pulse">
-                      <div className="aspect-[16/9] bg-slate-200 rounded-2xl mb-6" />
-                      <div className="h-6 bg-slate-200 rounded-md w-2/3 mb-4" />
-                      <div className="h-4 bg-slate-200 rounded-md w-1/3 mb-6" />
+                    <div
+                      key={i}
+                      className="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm animate-pulse"
+                    >
+                      <div className="aspect-[16/9] bg-slate-200 dark:bg-slate-600 rounded-2xl mb-6" />
+                      <div className="h-6 bg-slate-200 dark:bg-slate-600 rounded-md w-2/3 mb-4" />
+                      <div className="h-4 bg-slate-200 dark:bg-slate-600 rounded-md w-1/3 mb-6" />
                       <div className="space-y-2 mb-8">
-                        <div className="h-3 bg-slate-100 rounded-md w-full" />
-                        <div className="h-3 bg-slate-100 rounded-md w-4/5" />
+                        <div className="h-3 bg-slate-100 dark:bg-slate-600 rounded-md w-full" />
+                        <div className="h-3 bg-slate-100 dark:bg-slate-600 rounded-md w-4/5" />
                       </div>
-                      <div className="h-10 bg-slate-100 rounded-xl w-full" />
+                      <div className="h-10 bg-slate-100 dark:bg-slate-600 rounded-xl w-full" />
                     </div>
                   ))}
                 </div>
               ) : error ? (
-                <div className="text-center py-24 bg-white rounded-3xl border border-red-100">
-                  <p className="text-red-500 font-medium">Не удалось загрузить агентов. Попробуйте ещё раз.</p>
+                <div className="text-center py-24 bg-white dark:bg-slate-800 rounded-3xl border border-red-100 dark:border-red-900/20">
+                  <p className="text-red-500 dark:text-red-400 font-medium">
+                    Не удалось загрузить агентов. Попробуйте ещё раз.
+                  </p>
                 </div>
               ) : filtered.length === 0 ? (
-                <div className="text-center py-24 bg-white rounded-3xl border border-slate-100">
-                  <p className="text-slate-500 font-medium text-lg mb-2">Пока нет наших решений.</p>
+                <div className="text-center py-24 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
+                  <p className="text-slate-500 dark:text-slate-400 font-medium text-lg mb-2">
+                    Пока нет наших решений.
+                  </p>
                   {isAuthenticated && (
                     <button
                       onClick={() => setShowAddModal(true)}
