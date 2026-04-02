@@ -230,7 +230,7 @@ export default function Agents() {
             </div>
           </div>
 
-          <div className="flex gap-1 p-1 bg-slate-200 rounded-2xl w-fit mb-8">
+          <div className="flex gap-1 p-1 bg-slate-200 dark:bg-slate-700 rounded-2xl w-fit mb-8">
             <button
               onClick={() => setTab("find")}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${tab === "find" ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"}`}
@@ -265,6 +265,24 @@ export default function Agents() {
           ) : tab === "free" ? (
             <>
               <div className="mb-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Поиск по бесплатным решениям
+                  </h3>
+                  <div className="relative flex-grow max-w-md">
+                    <Search
+                      size={18}
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+                    />
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Поиск по бесплатным агентам..."
+                      className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all shadow-sm"
+                    />
+                  </div>
+                </div>
                 <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
                   Тип бизнеса
                 </h3>
@@ -391,6 +409,26 @@ export default function Agents() {
             </>
           ) : (
             <>
+              <div className="mb-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Поиск по нашим решениям
+                  </h3>
+                  <div className="relative flex-grow max-w-md">
+                    <Search
+                      size={18}
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+                    />
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Поиск по нашим агентам..."
+                      className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all shadow-sm"
+                    />
+                  </div>
+                </div>
+              </div>
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {[1, 2, 3].map((i) => (
