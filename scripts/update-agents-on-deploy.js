@@ -1,5 +1,5 @@
 // Скрипт для автоматического обновления агентов при деплое
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from "@supabase/supabase-js";
 
 // Данные агентов
 const agentsData = [
@@ -92,24 +92,23 @@ const agentsData = [
 
 async function updateAgentsOnDeploy() {
   console.log("🚀 Автоматическое обновление агентов при деплое...");
-  
+
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
     console.log("⚠️ Переменные Supabase не найдены, пропускаем обновление");
     return;
   }
-  
+
   const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY
+    process.env.SUPABASE_ANON_KEY,
   );
-  
+
   try {
     for (const agent of agentsData) {
       console.log(`📝 Обновляем: ${agent.name}`);
-      
-      const { error } = await supabase
-        .from('agents')
-        .upsert({
+
+      const { error } = await supabase.from("agents").upsert(
+        {
           id: agent.id,
           name: agent.name,
           description: agent.description,
@@ -117,17 +116,19 @@ async function updateAgentsOnDeploy() {
           useCase: agent.useCase,
           tags: agent.tags,
           isTeamSolution: agent.isTeamSolution,
-        }, {
-          onConflict: 'id'
-        });
-      
+        },
+        {
+          onConflict: "id",
+        },
+      );
+
       if (error) {
         console.error(`❌ Ошибка: ${error.message}`);
       } else {
         console.log(`✅ Обновлен: ${agent.name}`);
       }
     }
-    
+
     console.log("✅ Автоматическое обновление завершено!");
   } catch (error) {
     console.error("❌ Критическая ошибка:", error);
