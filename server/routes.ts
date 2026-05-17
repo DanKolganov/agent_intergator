@@ -11,6 +11,7 @@ import {
 } from "./replit_integrations/auth";
 import { db } from "./db";
 import { knowledgeBase, llmUsage } from "@shared/schema";
+import { SUPPORT_CONTACTS } from "@shared/contacts";
 import { eq, sql } from "drizzle-orm";
 
 function getLLMClient() {
@@ -112,7 +113,7 @@ async function seedDatabase() {
 Идеально для: интернет-магазинов, сервисов, любого бизнеса с клиентской поддержкой`,
       industry: "E-commerce",
       useCase: "Обслуживание клиентов",
-      tags: ["поддержка клиентов", "чат-бот", "автоответчик", "FAQ"],
+      tags: ["Поддержка клиентов", "Чат-бот", "Автоответы", "FAQ"],
       imageUrl:
         "https://images.unsplash.com/photo-1521790797524-b2497295b8a0?w=800&q=80",
       isTeamSolution: false,
@@ -130,7 +131,7 @@ async function seedDatabase() {
 Идеально для: любого бизнеса где важен финансовый контроль и отчетность`,
       industry: "Finance",
       useCase: "Финансовый анализ",
-      tags: ["аналитика", "отчеты", "KPI", "дэшборд", "метрики"],
+      tags: ["Аналитика", "Отчёты", "KPI", "Дашборд"],
       imageUrl:
         "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
       isTeamSolution: false,
@@ -148,7 +149,7 @@ async function seedDatabase() {
 Идеально для: B2B услуг, консалтинга, услуг с долгим циклом сделки`,
       industry: "B2B Services",
       useCase: "Продажи",
-      tags: ["лиды", "продажи", "CRM", "календарь", "квалификация"],
+      tags: ["Лиды", "Продажи", "CRM", "Календарь"],
       imageUrl:
         "https://images.unsplash.com/photo-1556761175-5973dc0f32b7?w=800&q=80",
       isTeamSolution: false,
@@ -166,7 +167,7 @@ async function seedDatabase() {
 Идеально для: компаний с штатом от 5+ человек`,
       industry: "Human Resources",
       useCase: "Кадровый делопроизводство",
-      tags: ["онбординг", "кадры", "HR", "адаптация", "обучение"],
+      tags: ["Онбординг", "Кадры", "HR", "Адаптация"],
       imageUrl:
         "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80",
       isTeamSolution: false,
@@ -185,7 +186,7 @@ async function seedDatabase() {
 Идеально для: розничных магазинов, интернет-магазинов, торговых точек`,
       industry: "Retail",
       useCase: "Операционная деятельность",
-      tags: ["ритейл", "склад", "заказы", "уведомления", "автоматизация"],
+      tags: ["Ритейл", "Склад", "Заказы", "Уведомления"],
       imageUrl:
         "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
       isTeamSolution: true,
@@ -749,7 +750,14 @@ ${JSON.stringify(candidates)}
 
       // If too many follow-ups, offer consultation
       if (followUpCount >= 3) {
-        const consultationMessage = `На основе предоставленной информации:\n\n${contextData.map((c: any) => `Вопрос: ${c.question}\nОтвет: ${c.answer}`).join("\n\n")}\n\n**Предлагаем вам личную консультацию** с нашим специалистом для детальной проработки решения.\n\nСвяжитесь с нами:\n• Telegram: @your_support\n• Email: support@example.com\n• Телефон: +7 (XXX) XXX-XX-XX\n\nМы поможем создать идеального AI-агента для вашего бизнеса!`;
+        const contactLines = [
+          SUPPORT_CONTACTS.telegram && `• Telegram: ${SUPPORT_CONTACTS.telegram}`,
+          SUPPORT_CONTACTS.email && `• Email: ${SUPPORT_CONTACTS.email}`,
+          SUPPORT_CONTACTS.phone && `• Телефон: ${SUPPORT_CONTACTS.phone}`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+        const consultationMessage = `На основе предоставленной информации:\n\n${contextData.map((c: any) => `Вопрос: ${c.question}\nОтвет: ${c.answer}`).join("\n\n")}\n\n**Предлагаем вам личную консультацию** с нашим специалистом для детальной проработки решения.\n\nСвяжитесь с нами:\n${contactLines}\n\nМы поможем подобрать идеальное решение для вашего бизнеса!`;
 
         const updatedReq = await storage.updateCustomRequestStatus(
           customReq.id,

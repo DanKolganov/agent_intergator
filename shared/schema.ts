@@ -15,7 +15,7 @@ export const agents = pgTable("agents", {
   tags: text("tags").array().default([]).notNull(),
   imageUrl: text("image_url"),
   isTeamSolution: boolean("is_team_solution").default(false).notNull(),
-  sourceUrl: text("source_url"),
+  sourceUrl: text("source_url").unique(),
   githubStars: integer("github_stars"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });

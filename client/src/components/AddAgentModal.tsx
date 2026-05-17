@@ -5,17 +5,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
 
+export type AddAgentInitial = Partial<{
+  name: string;
+  description: string;
+  industry: string;
+  useCase: string;
+  imageUrl: string;
+  tags: string[];
+  isTeamSolution: boolean;
+}>;
+
 interface Props {
   onClose: () => void;
-  initial?: Partial<{
-    name: string;
-    description: string;
-    industry: string;
-    useCase: string;
-    imageUrl: string;
-    tags: string[];
-    isTeamSolution: boolean;
-  }>;
+  initial?: AddAgentInitial;
 }
 
 export default function AddAgentModal({ onClose, initial }: Props) {

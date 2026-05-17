@@ -7,6 +7,30 @@ import { createServer } from "http";
 const app = express();
 const httpServer = createServer(app);
 
+const isProd = process.env.NODE_ENV === "production";
+
+// Fail loudly in production if SESSION_SECRET is missing or left at the
+// placeholder. Without a strong secret, express-session cookies can be forged.
+if (isProd) {
+  const secret = process.env.SESSION_SECRET || "";
+  const looksWeak =
+    !secret ||
+    secret.length < 32 ||
+    /replace-with|placeholder|changeme|secret/i.test(secret);
+  if (looksWeak) {
+    throw new Error(
+      "SESSION_SECRET is missing or weak. Set a 32+ char random string " +
+        "in production (e.g. `node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"`).",
+    );
+  }
+  if (!process.env.FRONTEND_ORIGIN) {
+    console.warn(
+      "[security] FRONTEND_ORIGIN is not set in production — CORS allows " +
+        "all origins. Set FRONTEND_ORIGIN to your public site URL to lock it down.",
+    );
+  }
+}
+
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;

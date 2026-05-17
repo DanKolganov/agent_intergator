@@ -13,7 +13,7 @@ import {
   buildAgentsCatalogUrl,
 } from "@/lib/catalog-filters";
 import { Search, Star, Globe, Plus, X, MessageCircle } from "lucide-react";
-import AddAgentModal from "@/components/AddAgentModal";
+import AddAgentModal, { type AddAgentInitial } from "@/components/AddAgentModal";
 
 type Tab = "free" | "team";
 type BusinessType =
@@ -75,7 +75,7 @@ export default function Agents() {
   const [search, setSearch] = useState(query.q);
   const [selectedTags, setSelectedTags] = useState<string[]>(query.tags);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addInitial, setAddInitial] = useState<any>(null);
+  const [addInitial, setAddInitial] = useState<AddAgentInitial | null>(null);
 
   const activeBusiness = activePresetKey(BUSINESS_TAG_PRESETS, selectedTags);
   const activeTask = activePresetKey(TASK_TAG_PRESETS, selectedTags);
