@@ -27,6 +27,7 @@ type AgentDraft = {
   industry: string;
   useCase: string;
   tags: string[];
+  imageQuery: string;
   imageUrl: string | null;
 };
 
@@ -132,7 +133,7 @@ async function fetchRepoMeta(r: GithubRepo): Promise<RepoMeta | null> {
     homepage: repoJson.homepage || null,
     ownerAvatar: repoJson.owner?.avatar_url || null,
     htmlUrl: repoJson.html_url,
-    readme: readme.slice(0, 8000),
+    readme: readme.slice(0, 4000),
   };
 }
 
@@ -157,19 +158,53 @@ async function normalizeWithLLM(
   llm: OpenAI,
 ): Promise<AgentDraft | null> {
   const prompt = `
-Ты — редактор каталога AI-агентов. На вход даны метаданные open-source GitHub-репозитория.
-Подготовь карточку для каталога на РУССКОМ языке в нашем стандартном формате.
+Ты — редактор каталога готовых решений для владельцев малого и среднего бизнеса.
+Читатель — обычный предприниматель, который НЕ разбирается в ИИ и программировании.
+На вход — open-source GitHub-репозиторий. Перепиши его так, как будто продаёшь
+готовое решение нетехническому человеку.
 
-Правила description:
-- Первая строка — название продукта (повтор поля name).
-- Пустая строка.
-- 4–6 пунктов через "• ".
-- Пустая строка.
-- Последняя строка: "Идеально для: ..." — короткое описание целевой аудитории.
+ВАЖНО про название (поле name):
+- ОСТАВЬ оригинальный бренд продукта как имя (например "AgentGPT", "BabyAGI",
+  "E2B", "AutoGen"). Это название уникально, по нему пользователь различит решения.
+- Если у продукта есть человекочитаемое имя в README — используй его.
+- НЕ ПРИДУМЫВАЙ generic-имена вроде "Автоматизация бизнес-процессов" —
+  такие будут дублироваться у разных карточек.
+- Только латиница и кириллица. БЕЗ иероглифов, арабской вязи и других алфавитов.
 
-Поля industry: одна из категорий, например "Разработка", "E-commerce", "Finance", "Маркетинг", "Аналитика", "Productivity", "DevOps", "Образование", "HR", "Контент".
-Поле useCase: короткая фраза, что именно делает агент ("Автоматизация продаж", "Поиск по документам" и т.д.).
-Поле tags: 3–8 коротких тегов, латиницей, lowercase, через дефис (как у нас в UI).
+В description, industry, useCase, tags — наоборот, ПИШИ простым РУССКИМ языком
+о бизнес-пользе. ЗАПРЕЩЕНО употреблять слова: "AI-агент", "агент", "LLM", "GPT",
+"модель", "API", "SDK", "framework", "фреймворк", "RAG", "vector", "embedding",
+"промпт", "prompt", "open-source", "опен-сорс", "репозиторий", "GitHub",
+"Python", "Node", любые названия библиотек, технологий, языков программирования.
+
+Описывай ЧТО получит бизнес: какую задачу решает, что автоматизирует, сколько
+времени и денег экономит, кому подойдёт.
+
+Правила description (на РУССКОМ):
+- Первая строка — название решения (то же, что в поле name).
+- Пустая строка.
+- 4–6 пунктов через "• " — что решение УМЕЕТ ДЛЯ БИЗНЕСА (не как устроено).
+  Каждый пункт — короткое предложение про пользу, без жаргона.
+- Пустая строка.
+- Последняя строка: "Идеально для: ..." — кому это нужно (тип бизнеса, отдел, размер).
+
+Поле industry — одна из бизнес-категорий на РУССКОМ:
+"E-commerce", "Finance", "Маркетинг", "Продажи", "HR", "Образование", "Контент",
+"Поддержка клиентов", "Аналитика", "Operations", "Юридическое", "Здравоохранение".
+
+Поле useCase — короткая бизнес-фраза на русском: "Поддержка клиентов 24/7",
+"Аналитика продаж", "Подбор сотрудников", "Создание контента".
+
+Поле tags — РОВНО 3–4 простых русских слова, как пользователь искал бы решение.
+ОБЫЧНЫЕ слова с заглавных букв и пробелами, НЕ латиница, НЕ через дефис.
+Не больше 4. Без дублирования смысла между тегами.
+Хорошо: ["Поддержка клиентов", "Чат-бот", "Автоответы"]
+Плохо:  ["customer-support", "chatbot", "ai-agent"]
+
+Поле imageQuery — 2–3 АНГЛИЙСКИХ слова для поиска тематической фото на Unsplash.
+Должно отражать БИЗНЕС-СЦЕНУ, а не технологию.
+Хорошо: "customer support office", "team meeting analytics", "online shop laptop".
+Плохо:  "ai robot", "code screen", "neural network".
 
 Верни СТРОГО JSON:
 {
@@ -177,18 +212,18 @@ async function normalizeWithLLM(
   "description": string,
   "industry": string,
   "useCase": string,
-  "tags": string[]
+  "tags": string[],
+  "imageQuery": string
 }
 
-Метаданные репозитория:
+Метаданные репозитория (для понимания сути, в описании их НЕ упоминать):
 ${JSON.stringify(
   {
     fullName: meta.fullName,
     description: meta.description,
-    stars: meta.stars,
     topics: meta.topics,
     homepage: meta.homepage,
-    readmeExcerpt: meta.readme.slice(0, 4000),
+    readmeExcerpt: meta.readme.slice(0, 2000),
   },
   null,
   2,
@@ -216,18 +251,67 @@ ${JSON.stringify(
   ) {
     return null;
   }
+  const imageQuery =
+    typeof raw.imageQuery === "string" && raw.imageQuery.trim()
+      ? raw.imageQuery.trim()
+      : "business office team";
+
+  // Sanity-check the name: LLM tends to give generic russian names
+  // ("Автоматизация бизнес-процессов") that collide across repos.
+  // Fall back to the actual repo name when LLM output is generic or
+  // contains characters outside latin/cyrillic.
+  const repoName = meta.fullName.split("/")[1] || raw.name;
+  const latinCyrillicOnly =
+    /^[\p{Script=Latin}\p{Script=Cyrillic}\d\s.,'\-()&+/!?:]+$/u;
+  let name = String(raw.name).trim();
+  if (!latinCyrillicOnly.test(name)) {
+    name = repoName;
+  }
   return {
-    name: raw.name.trim(),
+    name,
     description: raw.description.trim(),
     industry: raw.industry.trim(),
     useCase: raw.useCase.trim(),
     tags: raw.tags
       .filter((t: any) => typeof t === "string")
-      .map((t: string) => t.toLowerCase().trim())
+      .map((t: string) => t.trim())
       .filter(Boolean)
-      .slice(0, 8),
-    imageUrl: meta.ownerAvatar,
+      .slice(0, 4),
+    imageQuery,
+    imageUrl: null,
   };
+}
+
+async function fetchUnsplashImage(query: string): Promise<string | null> {
+  try {
+    const url = `https://unsplash.com/napi/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`;
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "agent_intergator-importer/1.0",
+        Accept: "application/json",
+      },
+    });
+    if (!res.ok) return null;
+    const data: any = await res.json();
+    const photo = data?.results?.[0];
+    if (!photo) return null;
+    const raw: string | undefined =
+      photo.urls?.regular || photo.urls?.small || photo.urls?.full;
+    if (!raw) return null;
+    return `${raw.split("?")[0]}?w=800&q=80&auto=format&fit=crop`;
+  } catch {
+    return null;
+  }
+}
+
+async function pickImage(
+  draft: AgentDraft,
+  meta: RepoMeta,
+): Promise<string> {
+  const unsplash = await fetchUnsplashImage(draft.imageQuery);
+  if (unsplash) return unsplash;
+  const [owner, repo] = meta.fullName.split("/");
+  return `https://opengraph.githubassets.com/1/${owner}/${repo}`;
 }
 
 async function loadExistingSourceUrls(): Promise<Set<string>> {
@@ -291,7 +375,8 @@ async function main() {
             console.log(`  fail LLM normalize: ${meta.fullName}`);
             return;
           }
-          await db
+          const imageUrl = await pickImage(draft, meta);
+          const inserted = await db
             .insert(agents)
             .values({
               name: draft.name,
@@ -299,14 +384,20 @@ async function main() {
               industry: draft.industry,
               useCase: draft.useCase,
               tags: draft.tags,
-              imageUrl: draft.imageUrl,
+              imageUrl,
               isTeamSolution: false,
               sourceUrl: cand.url,
               githubStars: meta.stars,
             })
-            .onConflictDoNothing();
+            .onConflictDoNothing({ target: agents.sourceUrl })
+            .returning({ id: agents.id });
+          if (inserted.length === 0) {
+            skipped += 1;
+            console.log(`  · already in DB (source_url conflict): ${draft.name}`);
+            return;
+          }
           imported += 1;
-          console.log(`  ✓ imported ${draft.name} (${meta.stars}★)`);
+          console.log(`  ✓ imported #${inserted[0].id} ${draft.name} (${meta.stars}★)`);
         } catch (err) {
           failed += 1;
           console.warn(`  ✗ ${cand.url}: ${(err as Error).message}`);
