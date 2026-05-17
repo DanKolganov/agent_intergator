@@ -1,26 +1,32 @@
-import { Link, useRoute } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { Bot, Sparkles, LogOut, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useAuth } from "@/hooks/use-auth";
 import ThemeToggle from "./ThemeToggle";
+import { parseAgentsQuery } from "@/lib/catalog-filters";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-function NavLink({
-  href,
+function CatalogNavLink({
+  tab,
   children,
 }: {
-  href: string;
+  tab: "free" | "team";
   children: React.ReactNode;
 }) {
-  const [isActive] = useRoute(href);
+  const [pathname] = useLocation();
+  const search = useSearch();
+  const isAgents = pathname === "/agents" || pathname.startsWith("/agents/");
+  const currentTab = isAgents ? parseAgentsQuery(search).tab : null;
+  const isActive = pathname === "/agents" && currentTab === tab;
+
   return (
     <Link
-      href={href}
+      href={tab === "team" ? "/agents?tab=team" : "/agents?tab=free"}
       className={cn(
         "relative px-4 py-2 text-sm font-medium transition-colors",
         isActive
@@ -42,6 +48,16 @@ function NavLink({
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
+  const [pathname] = useLocation();
+  const search = useSearch();
+
+  const onCustomPage = pathname === "/custom" || pathname.startsWith("/custom/");
+  const onAgentsPage = pathname === "/agents";
+  const agentsTab = onAgentsPage ? parseAgentsQuery(search).tab : null;
+
+  const showCatalogLink = !onAgentsPage || agentsTab !== "free";
+  const showTeamLink = !onAgentsPage || agentsTab !== "team";
+  const showCustomCta = !onCustomPage;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/20 dark:border-slate-700/50 glass-panel dark:glass-panel-dark bg-white/70 dark:bg-slate-900/70 backdrop-blur-md">
@@ -61,28 +77,49 @@ export function Navbar() {
             </Link>
 
             <nav className="hidden md:flex items-center gap-2">
-              <NavLink href="/agents?tab=free">Каталог</NavLink>
-              <NavLink href="/agents?tab=team">Наши решения</NavLink>
-              {isAuthenticated && <NavLink href="/history">История</NavLink>}
+              {showCatalogLink && (
+                <CatalogNavLink tab="free">Каталог</CatalogNavLink>
+              )}
+              {showTeamLink && (
+                <CatalogNavLink tab="team">Наши решения</CatalogNavLink>
+              )}
+              {isAuthenticated && pathname === "/history" && (
+                <span className="relative px-4 py-2 text-sm font-medium text-primary">
+                  История
+                </span>
+              )}
+              {isAuthenticated && pathname !== "/history" && (
+                <Link
+                  href="/history"
+                  className="relative px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                >
+                  История
+                </Link>
+              )}
             </nav>
           </div>
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Link
-              href="/custom"
-              className="group relative inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-slate-900 rounded-full hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none"
-            >
-              <Sparkles
-                size={15}
-                className="text-accent group-hover:animate-pulse"
-              />
-              <span>Заказать кастомного агента</span>
-            </Link>
+            {showCustomCta && (
+              <Link
+                href="/custom"
+                className="group relative inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-slate-900 dark:bg-primary rounded-full hover:bg-slate-800 dark:hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none"
+              >
+                <Sparkles
+                  size={15}
+                  className="text-accent group-hover:animate-pulse"
+                />
+                <span className="hidden sm:inline">
+                  Заказать кастомного агента
+                </span>
+                <span className="sm:hidden">Заказ агента</span>
+              </Link>
+            )}
 
             {isAuthenticated && (
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600">
                   {user?.profileImageUrl ? (
                     <img
                       src={user.profileImageUrl}
@@ -90,15 +127,18 @@ export function Navbar() {
                       className="w-6 h-6 rounded-full object-cover"
                     />
                   ) : (
-                    <User size={16} className="text-slate-500" />
+                    <User
+                      size={16}
+                      className="text-slate-500 dark:text-slate-400"
+                    />
                   )}
-                  <span className="text-sm font-medium text-slate-700 hidden sm:block">
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200 hidden sm:block">
                     {user?.firstName || user?.email?.split("@")[0] || "User"}
                   </span>
                 </div>
                 <button
                   onClick={() => logout()}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-full border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                   data-testid="button-logout"
                 >
                   <LogOut size={14} />

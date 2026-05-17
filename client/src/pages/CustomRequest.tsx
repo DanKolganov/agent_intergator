@@ -38,7 +38,7 @@ export default function CustomRequest() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <motion.div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       <Navbar />
 
       <main className="flex-grow flex items-center justify-center p-4 py-12">
@@ -51,7 +51,7 @@ export default function CustomRequest() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="glass-panel rounded-3xl p-8 md:p-12 relative z-10"
+            className="glass-panel dark:glass-panel-dark bg-white/80 dark:bg-slate-800/95 rounded-3xl p-8 md:p-12 relative z-10 border border-slate-200/80 dark:border-slate-600/80"
           >
             <div className="mb-10 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent text-white mb-6 shadow-lg shadow-primary/20">
@@ -72,17 +72,17 @@ export default function CustomRequest() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-xl"
+                  className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 border border-primary/20 dark:border-primary/30 rounded-xl"
                 >
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white flex-shrink-0">
                       <HeadphonesIcon size={20} />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-slate-900 mb-1">
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-1">
                         Нужна помощь с формулировкой?
                       </h3>
-                      <p className="text-sm text-slate-600 mb-3">
+                      <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
                         Наша команда поможет разобраться в ваших задачах и
                         составить техническое задание бесплатно.
                       </p>
@@ -95,7 +95,7 @@ export default function CustomRequest() {
                         >
                           Написать в Telegram →
                         </a>
-                        <span className="text-slate-400">|</span>
+                        <span className="text-slate-400 dark:text-slate-500">|</span>
                         <a
                           href="mailto:support@example.com"
                           className="text-sm font-medium text-primary hover:underline"
@@ -106,7 +106,7 @@ export default function CustomRequest() {
                     </div>
                     <button
                       onClick={() => setShowHelpOffer(false)}
-                      className="text-slate-400 hover:text-slate-600"
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                     >
                       ×
                     </button>
@@ -115,8 +115,8 @@ export default function CustomRequest() {
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <Building2 size={16} className="text-slate-400" />
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                  <Building2 size={16} className="text-slate-400 dark:text-slate-500" />
                   Название бизнеса
                 </label>
                 <input
@@ -127,13 +127,13 @@ export default function CustomRequest() {
                     setFormData({ ...formData, businessName: e.target.value })
                   }
                   placeholder="Например: Acme Corp"
-                  className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 text-slate-900 placeholder:text-slate-400"
+                  className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <FileText size={16} className="text-slate-400" />
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                  <FileText size={16} className="text-slate-400 dark:text-slate-500" />
                   Потребности и задачи
                 </label>
                 <textarea
@@ -144,28 +144,28 @@ export default function CustomRequest() {
                     setFormData({ ...formData, businessNeeds: e.target.value })
                   }
                   placeholder="Опишите процессы, боли и что хотите автоматизировать..."
-                  className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 text-slate-900 placeholder:text-slate-400 resize-none"
+                  className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-none"
                 />
               </div>
 
               {/* Business Plan Preview */}
-              <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="p-5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-600 rounded-xl">
                 <div className="flex items-center gap-2 mb-4">
                   <Lightbulb size={20} className="text-accent" />
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">
                     Примерный план работы агента
                   </h3>
                 </div>
-                <div className="space-y-3 text-sm text-slate-600">
+                <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-medium flex-shrink-0">
                       1
                     </div>
                     <div>
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-slate-900 dark:text-slate-100">
                         Анализ входящих данных
                       </span>
-                      <p className="text-slate-500">
+                      <p className="text-slate-500 dark:text-slate-400">
                         Агент будет собирать и структурировать информацию из
                         указанных источников
                       </p>
@@ -176,10 +176,10 @@ export default function CustomRequest() {
                       2
                     </div>
                     <div>
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-slate-900 dark:text-slate-100">
                         Обработка и аналитика
                       </span>
-                      <p className="text-slate-500">
+                      <p className="text-slate-500 dark:text-slate-400">
                         Обработка данных с использованием AI для выявления
                         паттернов и инсайтов
                       </p>
@@ -190,10 +190,10 @@ export default function CustomRequest() {
                       3
                     </div>
                     <div>
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-slate-900 dark:text-slate-100">
                         Автоматические действия
                       </span>
-                      <p className="text-slate-500">
+                      <p className="text-slate-500 dark:text-slate-400">
                         Выполнение рутинных задач: отправка уведомлений,
                         создание отчётов, обновление данных
                       </p>
@@ -204,10 +204,10 @@ export default function CustomRequest() {
                       4
                     </div>
                     <div>
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-slate-900 dark:text-slate-100">
                         Отчётность и интеграция
                       </span>
-                      <p className="text-slate-500">
+                      <p className="text-slate-500 dark:text-slate-400">
                         Формирование отчётов и интеграция с вашими существующими
                         системами
                       </p>
@@ -215,19 +215,19 @@ export default function CustomRequest() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-200">
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
+                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                     <Clock size={16} />
                     <span>
                       Срок разработки:{" "}
-                      <strong className="text-slate-900">3-7 дней</strong>
+                      <strong className="text-slate-900 dark:text-slate-100">3-7 дней</strong>
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 mt-1">
+                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 mt-1">
                     <Users size={16} />
                     <span>
                       Поддержка:{" "}
-                      <strong className="text-slate-900">
+                      <strong className="text-slate-900 dark:text-slate-100">
                         первые 2 недели бесплатно
                       </strong>
                     </span>
@@ -252,7 +252,7 @@ export default function CustomRequest() {
             </form>
 
             {createMutation.isError && (
-              <div className="mt-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100">
+              <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl text-sm border border-red-100 dark:border-red-800/40">
                 {createMutation.error.message ||
                   "Что-то пошло не так. Попробуйте ещё раз."}
               </div>
@@ -260,6 +260,6 @@ export default function CustomRequest() {
           </motion.div>
         </div>
       </main>
-    </div>
+    </motion.div>
   );
 }

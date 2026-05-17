@@ -1,112 +1,67 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, Send, Bot, Sparkles, ArrowRight } from "lucide-react";
-import { useAgents } from "@/hooks/use-agents";
 import { useLocation } from "wouter";
+import {
+  buildAgentsCatalogUrl,
+  resolveCatalogFromText,
+} from "@/lib/catalog-filters";
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
   timestamp: Date;
+  catalogUrl?: string;
 }
+
+const QUICK_PROMPTS = [
+  {
+    label: "Чат-бот для клиентов",
+    text: "Нужен чат-бот для работы с клиентами и поддержки",
+  },
+  {
+    label: "Маркетинг в соцсетях",
+    text: "Хочу автоматизировать маркетинг и email-рассылки",
+  },
+  {
+    label: "Финансы для ресторана",
+    text: "Нужна финансовая аналитика и отчёты для ресторана",
+  },
+];
 
 export default function AIConsultant() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [, setLocation] = useLocation();
-  const { data: agents } = useAgents();
 
-  const getCatalogLink = (userMessage: string): string => {
-    const lower = userMessage.toLowerCase();
-    if (
-      lower.includes("клиент") ||
-      lower.includes("покупатель") ||
-      lower.includes("обслуживание")
-    )
-      return "/agents?tab=free&task=customers";
-    if (
-      lower.includes("маркетинг") ||
-      lower.includes("реклама") ||
-      lower.includes("продвижение")
-    )
-      return "/agents?tab=free&task=marketing";
-    if (
-      lower.includes("финансы") ||
-      lower.includes("деньги") ||
-      lower.includes("бюджет")
-    )
-      return "/agents?tab=free&task=finance";
-    if (
-      lower.includes("ресторан") ||
-      lower.includes("кафе") ||
-      lower.includes("еда")
-    )
-      return "/agents?tab=free&business=restaurant";
-    if (
-      lower.includes("отель") ||
-      lower.includes("гостиница") ||
-      lower.includes("бронирование")
-    )
-      return "/agents?tab=free&business=hospitality";
-    return "/agents?tab=free";
+  const analyzeAndReply = (userText: string) => {
+    const { tags, summary } = resolveCatalogFromText(userText);
+    const catalogUrl = buildAgentsCatalogUrl({ tab: "free", tags });
+
+    if (tags.length > 0) {
+      return {
+        text: `Подобрал ${summary}.\n\n🏷️ Теги: ${tags.slice(0, 4).join(", ")}${tags.length > 4 ? "…" : ""}\n\nСейчас открою каталог с подходящими агентами.`,
+        catalogUrl,
+        redirect: true,
+      };
+    }
+
+    return {
+      text: "Опишите задачу чуть конкретнее — например: «чат-бот для отеля», «маркетинг для кафе», «финансовая аналитика». Или нажмите кнопку ниже, чтобы открыть весь каталог бесплатных решений.",
+      catalogUrl: buildAgentsCatalogUrl({ tab: "free" }),
+      redirect: false,
+    };
   };
 
-  const generateResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-
-    // Анализ запроса и рекомендации
-    if (
-      lowerMessage.includes("клиент") ||
-      lowerMessage.includes("покупатель") ||
-      lowerMessage.includes("обслуживание")
-    ) {
-      return "На основе вашего запроса рекомендую решения для работы с клиентами. Вот лучшие варианты:\n\n🤖 **Чат-бот для поддержки клиентов** - 24/7 автоматическая поддержка\n📊 **Анализ обратной связи** - сбор и обработка отзывов\n📧 **Email-маркетинг** - персонализированные рассылки\n\nХотите посмотреть полный каталог решений для работы с клиентами?";
-    }
-
-    if (
-      lowerMessage.includes("маркетинг") ||
-      lowerMessage.includes("реклама") ||
-      lowerMessage.includes("продвижение")
-    ) {
-      return "Отлично! Для маркетинга рекомендую следующие решения:\n\n✍️ **Контент-маркетинг** - генерация идей для статей и постов\n🔍 **SEO-оптимизация** - анализ ключевых слов и оптимизация\n📱 **Соцсети** - автоматизация публикаций и аналитика\n\nКакой аспект маркетинга вас интересует больше всего?";
-    }
-
-    if (
-      lowerMessage.includes("финансы") ||
-      lowerMessage.includes("деньги") ||
-      lowerMessage.includes("бюджет")
-    ) {
-      return "Для финансовых задач рекомендую:\n\n📈 **Финансовая аналитика** - анализ доходов и расходов\n💰 **Бюджетирование** - планирование и контроль бюджета\n🧾 **Налоговая оптимизация** - автоматизация налоговой отчетности\n\nКакая финансовая задача наиболее актуальна для вашего бизнеса?";
-    }
-
-    if (
-      lowerMessage.includes("ресторан") ||
-      lowerMessage.includes("кафе") ||
-      lowerMessage.includes("еда")
-    ) {
-      return "Для ресторанного бизнеса рекомендую:\n\n🍽️ **Управление заказами** - автоматизация приёма заказов\n⭐ **Работа с отзывами** - мониторинг и ответ на отзывы\n📊 **Аналитика посещаемости** - анализ загруженности и популярности блюд\n\nХотите увидеть все решения для ресторанов и кафе?";
-    }
-
-    if (
-      lowerMessage.includes("отель") ||
-      lowerMessage.includes("гостиница") ||
-      lowerMessage.includes("бронирование")
-    ) {
-      return "Для гостиничного бизнеса рекомендую:\n\n🏨 **Управление бронированием** - автоматизация номерного фонда\n⭐ **Работа с отзывами** - мониторинг на всех площадках\n📧 **Email-рассылки** - информирование гостей о специальных предложениях\n\nКакая задача наиболее актуальна для вашего отеля?";
-    }
-
-    // Общий ответ
-    return "Понял вашу задачу! Чтобы подобрать лучшие решения, уточните:\n\n🎯 **Сфера деятельности:** рестораны, отели, торговля, услуги?\n🎯 **Основная задача:** клиенты, маркетинг, финансы, операции?\n\nИли можете сразу посмотреть полный каталог бесплатных AI-решений - там уже всё сгруппировано по отраслям и задачам!";
-  };
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const sendMessage = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: input,
+      text: trimmed,
       isUser: true,
       timestamp: new Date(),
     };
@@ -115,18 +70,25 @@ export default function AIConsultant() {
     setInput("");
     setIsTyping(true);
 
-    // Имитация задержки ответа
     setTimeout(() => {
+      const result = analyzeAndReply(trimmed);
       const response: Message = {
         id: (Date.now() + 1).toString(),
-        text: generateResponse(input),
+        text: result.text,
         isUser: false,
         timestamp: new Date(),
+        catalogUrl: result.catalogUrl,
       };
       setMessages((prev) => [...prev, response]);
       setIsTyping(false);
-    }, 1000);
+
+      if (result.redirect && result.catalogUrl) {
+        setTimeout(() => setLocation(result.catalogUrl!), 1200);
+      }
+    }, 700);
   };
+
+  const handleSend = () => sendMessage(input);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -134,6 +96,9 @@ export default function AIConsultant() {
       handleSend();
     }
   };
+
+  const lastUserText =
+    [...messages].reverse().find((m) => m.isUser)?.text || input;
 
   return (
     <motion.section
@@ -159,8 +124,8 @@ export default function AIConsultant() {
           </h2>
 
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-8">
-            Кратко опишите вашу задачу, и я подберу наиболее подходящие
-            AI-инструменты для вашего бизнеса
+            Опишите задачу — подберём теги и сразу откроем каталог с подходящими
+            AI-инструментами
           </p>
         </motion.div>
 
@@ -171,7 +136,6 @@ export default function AIConsultant() {
           transition={{ delay: 0.2 }}
           className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
         >
-          {/* Сообщения */}
           <div className="h-96 overflow-y-auto p-6 space-y-4">
             {messages.length === 0 && (
               <div className="text-center py-12">
@@ -182,34 +146,19 @@ export default function AIConsultant() {
                   Привет! Я ваш AI-консультант
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 mb-6">
-                  Расскажите о вашей задаче, и я помогу найти подходящие
-                  решения. Например:
+                  Напишите задачу — открою каталог с нужными тегами. Например:
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
-                  <button
-                    onClick={() =>
-                      setInput("Нужен чат-бот для работы с клиентами")
-                    }
-                    className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 transition-colors"
-                  >
-                    Чат-бот для клиентов
-                  </button>
-                  <button
-                    onClick={() =>
-                      setInput("Хочу автоматизировать маркетинг в соцсетях")
-                    }
-                    className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 transition-colors"
-                  >
-                    Маркетинг в соцсетях
-                  </button>
-                  <button
-                    onClick={() =>
-                      setInput("Нужна финансовая аналитика для ресторана")
-                    }
-                    className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 transition-colors"
-                  >
-                    Финансы для ресторана
-                  </button>
+                  {QUICK_PROMPTS.map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => sendMessage(item.text)}
+                      className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 transition-colors"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -224,7 +173,7 @@ export default function AIConsultant() {
                   className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] ${message.isUser ? "order-2" : "order-1"}`}
+                    className={`max-w-[85%] ${message.isUser ? "order-2" : "order-1"}`}
                   >
                     <div
                       className={`rounded-2xl px-4 py-3 ${
@@ -236,6 +185,16 @@ export default function AIConsultant() {
                       <p className="whitespace-pre-line text-sm leading-relaxed">
                         {message.text}
                       </p>
+                      {!message.isUser && message.catalogUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setLocation(message.catalogUrl!)}
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary dark:text-primary hover:underline"
+                        >
+                          Открыть подборку
+                          <ArrowRight size={12} />
+                        </button>
+                      )}
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 px-1">
                       {message.timestamp.toLocaleTimeString("ru-RU", {
@@ -271,8 +230,7 @@ export default function AIConsultant() {
             </AnimatePresence>
           </div>
 
-          {/* Поле ввода */}
-          <div className="border-t border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-800/50">
+          <div className="border-t border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-900/50">
             <div className="flex gap-3">
               <div className="flex-1 relative">
                 <MessageCircle
@@ -283,13 +241,14 @@ export default function AIConsultant() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                   placeholder="Опишите вашу задачу..."
-                  className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400"
+                  className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                   disabled={isTyping}
                 />
               </div>
               <button
+                type="button"
                 onClick={handleSend}
                 disabled={!input.trim() || isTyping}
                 className="px-6 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
@@ -301,14 +260,13 @@ export default function AIConsultant() {
 
             <div className="mt-3 text-center">
               <button
+                type="button"
                 onClick={() =>
                   setLocation(
-                    messages.filter((m) => m.isUser).length > 0
-                      ? getCatalogLink(
-                          messages.filter((m) => m.isUser).slice(-1)[0]?.text ||
-                            input,
-                        )
-                      : "/agents?tab=free",
+                    buildAgentsCatalogUrl({
+                      tab: "free",
+                      tags: resolveCatalogFromText(lastUserText).tags,
+                    }),
                   )
                 }
                 className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors dark:text-primary dark:hover:text-primary/80"

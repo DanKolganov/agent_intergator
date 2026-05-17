@@ -15,6 +15,10 @@ import {
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import AIConsultant from "../components/AIConsultant";
+import {
+  catalogUrlForBusiness,
+  catalogUrlForTask,
+} from "@/lib/catalog-filters";
 
 export default function Home() {
   return (
@@ -115,7 +119,7 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&business=hospitality">
+                <Link href={catalogUrlForBusiness("hospitality")}>
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <HomeIcon size={32} />
@@ -145,7 +149,7 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&business=restaurant">
+                <Link href={catalogUrlForBusiness("restaurant")}>
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 hover:border-orange-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-orange-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Utensils size={32} />
@@ -175,7 +179,7 @@ export default function Home() {
                 transition={{ delay: 0.3 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&business=retail">
+                <Link href={catalogUrlForBusiness("retail")}>
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200 hover:border-green-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <ShoppingCart size={32} />
@@ -204,7 +208,7 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&business=rental">
+                <Link href={catalogUrlForBusiness("rental")}>
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-purple-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Car size={32} />
@@ -234,7 +238,7 @@ export default function Home() {
                 transition={{ delay: 0.5 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&business=service">
+                <Link href={catalogUrlForBusiness("service")}>
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-pink-50 to-pink-100 border border-pink-200 hover:border-pink-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-pink-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Wrench size={32} />
@@ -314,7 +318,7 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&task=customers">
+                <Link href={catalogUrlForTask("customers")}>
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
                       <BrainCircuit size={24} />
@@ -337,7 +341,7 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&task=marketing">
+                <Link href={catalogUrlForTask("marketing")}>
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-accent/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4">
                       <Sparkles size={24} />
@@ -359,7 +363,7 @@ export default function Home() {
                 transition={{ delay: 0.3 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&task=finance">
+                <Link href={catalogUrlForTask("finance")}>
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-green-500/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 mb-4">
                       <Building2 size={24} />
@@ -382,7 +386,7 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&task=hr">
+                <Link href={catalogUrlForTask("hr")}>
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 mb-4">
                       <Users size={24} />
@@ -405,7 +409,7 @@ export default function Home() {
                 transition={{ delay: 0.5 }}
                 className="group"
               >
-                <Link href="/agents?tab=free&task=operations">
+                <Link href={catalogUrlForTask("operations")}>
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-orange-500/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 mb-4">
                       <ArrowRight size={24} />

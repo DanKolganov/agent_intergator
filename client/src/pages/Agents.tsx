@@ -1,10 +1,17 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { AgentCard } from "@/components/AgentCard";
 import { useAgents } from "@/hooks/use-agents";
 import { useAuth } from "@/hooks/use-auth";
+import { useCatalogSearch } from "@/hooks/use-catalog-search";
+import {
+  BUSINESS_TAG_PRESETS,
+  TASK_TAG_PRESETS,
+  agentMatchesTags,
+  buildAgentsCatalogUrl,
+} from "@/lib/catalog-filters";
 import { Search, Star, Globe, Plus, X, MessageCircle } from "lucide-react";
 import AddAgentModal from "@/components/AddAgentModal";
 
@@ -42,96 +49,54 @@ const painPointMapping = {
   operations: "Операционная деятельность",
 };
 
-function parseAgentsSearch(location: string) {
-  const qs = location.split("?")[1] || "";
-  const params = new URLSearchParams(qs);
-  return {
-    tab: (params.get("tab") === "team" ? "team" : "free") as Tab,
-    business: (params.get("business") as BusinessType) || "all",
-    task: (params.get("task") as PainPoint) || "all",
-    tag: params.get("tag") || "",
-    q: params.get("q") || "",
-  };
-}
-
-function buildAgentsPath(opts: {
-  tab: Tab;
-  business?: BusinessType;
-  task?: PainPoint;
-  tag?: string;
-  q?: string;
-}) {
-  const params = new URLSearchParams();
-  params.set("tab", opts.tab);
-  if (opts.business && opts.business !== "all")
-    params.set("business", opts.business);
-  if (opts.task && opts.task !== "all") params.set("task", opts.task);
-  if (opts.tag) params.set("tag", opts.tag);
-  if (opts.q) params.set("q", opts.q);
-  return `/agents?${params.toString()}`;
+function activePresetKey(
+  presets: Record<string, string[]>,
+  selectedTags: string[],
+): string | null {
+  for (const [key, tags] of Object.entries(presets)) {
+    if (tags.length > 0 && tags.every((t) => selectedTags.includes(t)))
+      return key;
+    if (
+      tags.length > 0 &&
+      selectedTags.length > 0 &&
+      tags.some((t) => selectedTags.includes(t))
+    )
+      return key;
+  }
+  return null;
 }
 
 export default function Agents() {
   const { data: agents, isLoading, error } = useAgents();
   const { isAuthenticated } = useAuth();
-  const [location, setLocation] = useLocation();
+  const { search: urlSearch, query, navigate } = useCatalogSearch();
 
-  const urlState = useMemo(() => parseAgentsSearch(location), [location]);
-  const [tab, setTab] = useState<Tab>(urlState.tab);
-  const [businessType, setBusinessType] = useState<BusinessType>(
-    Object.keys(businessTypeMapping).includes(urlState.business)
-      ? urlState.business
-      : "all",
-  );
-  const [painPoint, setPainPoint] = useState<PainPoint>(
-    Object.keys(painPointMapping).includes(urlState.task)
-      ? urlState.task
-      : "all",
-  );
-  const [search, setSearch] = useState(urlState.q);
-  const [selectedTags, setSelectedTags] = useState<string[]>(
-    urlState.tag ? [urlState.tag] : [],
-  );
+  const [tab, setTab] = useState<Tab>(query.tab);
+  const [search, setSearch] = useState(query.q);
+  const [selectedTags, setSelectedTags] = useState<string[]>(query.tags);
   const [showAddModal, setShowAddModal] = useState(false);
   const [addInitial, setAddInitial] = useState<any>(null);
 
+  const activeBusiness = activePresetKey(BUSINESS_TAG_PRESETS, selectedTags);
+  const activeTask = activePresetKey(TASK_TAG_PRESETS, selectedTags);
+
   useEffect(() => {
-    const parsed = parseAgentsSearch(location);
-    setTab(parsed.tab);
-    if (Object.keys(businessTypeMapping).includes(parsed.business))
-      setBusinessType(parsed.business);
-    if (Object.keys(painPointMapping).includes(parsed.task))
-      setPainPoint(parsed.task);
-    setSearch(parsed.q);
-    setSelectedTags(parsed.tag ? [parsed.tag] : []);
-  }, [location]);
+    setTab(query.tab);
+    setSearch(query.q);
+    setSelectedTags(query.tags);
+  }, [urlSearch, query.tab, query.q, query.tags.join(",")]);
 
   const pushUrl = useCallback(
-    (patch: Partial<{
-      tab: Tab;
-      business: BusinessType;
-      task: PainPoint;
-      tag: string;
-      q: string;
-    }>) => {
-      const next = {
-        tab: patch.tab ?? tab,
-        business: patch.business ?? businessType,
-        task: patch.task ?? painPoint,
-        tag: patch.tag !== undefined ? patch.tag : selectedTags[0] || "",
-        q: patch.q !== undefined ? patch.q : search,
-      };
-      setLocation(
-        buildAgentsPath({
-          tab: next.tab,
-          business: next.business,
-          task: next.task,
-          tag: next.tag,
-          q: next.q,
+    (patch: Partial<{ tab: Tab; tags: string[]; q: string }>) => {
+      navigate(
+        buildAgentsCatalogUrl({
+          tab: patch.tab ?? tab,
+          tags: patch.tags !== undefined ? patch.tags : selectedTags,
+          q: patch.q !== undefined ? patch.q : search,
         }),
       );
     },
-    [tab, businessType, painPoint, selectedTags, search, setLocation],
+    [tab, selectedTags, search, navigate],
   );
 
   const allTags = useMemo(() => {
@@ -160,103 +125,40 @@ export default function Agents() {
       )
         return false;
 
-      if (
-        selectedTags.length > 0 &&
-        !selectedTags.every((t) => agent.tags?.includes(t))
-      )
-        return false;
-
-      if (businessType !== "all") {
-        const businessKeywords: Record<string, string[]> = {
-          hospitality: [
-            "отель",
-            "гостиница",
-            "хостел",
-            "апартаменты",
-            "бронирование",
-          ],
-          restaurant: ["ресторан", "кафе", "бар", "столовая", "еда", "кухня"],
-          retail: ["магазин", "товар", "продажа", "торговля", "продукты", "ритейл"],
-          rental: ["аренда", "прокат", "имущество", "жилье", "транспорт"],
-          service: ["услуга", "сервис", "консультация", "ремонт", "помощь"],
-        };
-        const keywords = businessKeywords[businessType];
-        const hasBusinessType = keywords.some(
-          (keyword) =>
-            agent.name.toLowerCase().includes(keyword) ||
-            agent.description.toLowerCase().includes(keyword) ||
-            agent.industry.toLowerCase().includes(keyword) ||
-            agent.tags?.some((tag) => tag.toLowerCase().includes(keyword)),
-        );
-        if (!hasBusinessType) return false;
-      }
-
-      if (painPoint !== "all") {
-        const painKeywords: Record<string, string[]> = {
-          customers: [
-            "клиент",
-            "покупатель",
-            "обслуживание",
-            "поддержка",
-            "общение",
-            "чат-бот",
-          ],
-          marketing: [
-            "маркетинг",
-            "реклама",
-            "продвижение",
-            "контент",
-            "seo",
-            "соцсети",
-          ],
-          finance: [
-            "финансы",
-            "деньги",
-            "бюджет",
-            "отчетность",
-            "аналитика",
-            "налоги",
-            "бухгалтер",
-          ],
-          hr: [
-            "персонал",
-            "сотрудник",
-            "кадры",
-            "найм",
-            "обучение",
-            "адаптация",
-            "hr",
-          ],
-          operations: [
-            "операции",
-            "процессы",
-            "автоматизация",
-            "документы",
-            "учет",
-            "склад",
-            "заказы",
-          ],
-        };
-        const keywords = painKeywords[painPoint];
-        const hasPainPoint = keywords.some(
-          (keyword) =>
-            agent.name.toLowerCase().includes(keyword) ||
-            agent.description.toLowerCase().includes(keyword) ||
-            agent.tags?.some((tag) => tag.toLowerCase().includes(keyword)),
-        );
-        if (!hasPainPoint) return false;
-      }
+      if (!agentMatchesTags(agent, selectedTags)) return false;
 
       return true;
     });
-  }, [agents, tab, search, selectedTags, businessType, painPoint]);
+  }, [agents, tab, search, selectedTags]);
 
   const toggleTag = (tag: string) => {
     const next = selectedTags.includes(tag)
       ? selectedTags.filter((t) => t !== tag)
       : [...selectedTags, tag];
     setSelectedTags(next);
-    pushUrl({ tag: next[0] || "", tab: "free" });
+    pushUrl({ tags: next, tab: "free" });
+  };
+
+  const applyBusinessFilter = (key: string) => {
+    if (key === "all") {
+      setSelectedTags([]);
+      pushUrl({ tags: [], tab: "free" });
+      return;
+    }
+    const tags = BUSINESS_TAG_PRESETS[key] ?? [];
+    setSelectedTags(tags);
+    pushUrl({ tags, tab: "free" });
+  };
+
+  const applyTaskFilter = (key: string) => {
+    if (key === "all") {
+      setSelectedTags([]);
+      pushUrl({ tags: [], tab: "free" });
+      return;
+    }
+    const tags = TASK_TAG_PRESETS[key] ?? [];
+    setSelectedTags(tags);
+    pushUrl({ tags, tab: "free" });
   };
 
   const gridContent = (
@@ -294,7 +196,7 @@ export default function Agents() {
             <button
               onClick={() => {
                 setSelectedTags([]);
-                pushUrl({ tag: "" });
+                pushUrl({ tags: [] });
               }}
               className="mt-4 text-primary font-medium text-sm hover:underline"
             >
@@ -305,14 +207,16 @@ export default function Agents() {
       ) : (
         <AnimatePresence mode="wait">
           <motion.div
-            key={
-              tab + selectedTags.join() + search + businessType + painPoint
-            }
+            key={tab + selectedTags.join() + search}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className={`grid grid-cols-1 gap-8 ${
+              tab === "team"
+                ? "md:grid-cols-2"
+                : "md:grid-cols-2 lg:grid-cols-3"
+            }`}
           >
             {filtered.map((agent, index) => (
               <motion.div
@@ -323,10 +227,11 @@ export default function Agents() {
               >
                 <AgentCard
                   agent={agent}
+                  variant={tab === "team" ? "premium" : "default"}
                   onTagClick={(tag) => {
                     setTab("free");
                     setSelectedTags([tag]);
-                    pushUrl({ tab: "free", tag });
+                    pushUrl({ tab: "free", tags: [tag] });
                   }}
                 />
               </motion.div>
@@ -447,13 +352,10 @@ export default function Agents() {
                   {Object.entries(businessTypeMapping).map(([key, label]) => (
                     <button
                       key={key}
-                      onClick={() => {
-                        const v = key as BusinessType;
-                        setBusinessType(v);
-                        pushUrl({ business: v, tab: "free" });
-                      }}
+                      onClick={() => applyBusinessFilter(key)}
                       className={`px-4 py-2 rounded-xl font-medium text-sm transition-all border ${
-                        businessType === key
+                        (key === "all" && selectedTags.length === 0) ||
+                        activeBusiness === key
                           ? "bg-primary text-white border-primary shadow-sm"
                           : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-primary/40 hover:text-primary"
                       }`}
@@ -471,13 +373,10 @@ export default function Agents() {
                   {Object.entries(painPointMapping).map(([key, label]) => (
                     <button
                       key={key}
-                      onClick={() => {
-                        const v = key as PainPoint;
-                        setPainPoint(v);
-                        pushUrl({ task: v, tab: "free" });
-                      }}
+                      onClick={() => applyTaskFilter(key)}
                       className={`px-4 py-2 rounded-xl font-medium text-sm transition-all border ${
-                        painPoint === key
+                        (key === "all" && selectedTags.length === 0) ||
+                        activeTask === key
                           ? "bg-accent text-white border-accent shadow-sm"
                           : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-accent/40 hover:text-accent"
                       }`}
@@ -506,7 +405,7 @@ export default function Agents() {
                     <button
                       onClick={() => {
                         setSelectedTags([]);
-                        pushUrl({ tag: "", tab: "free" });
+                        pushUrl({ tags: [], tab: "free" });
                       }}
                       className="px-3 py-1.5 rounded-full text-xs font-medium text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors flex items-center gap-1"
                     >
