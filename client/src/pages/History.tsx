@@ -6,9 +6,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { Clock } from "lucide-react";
 import { api } from "@shared/routes";
+import type { Agent } from "@shared/schema";
 
 function useViewHistory() {
-  return useQuery({
+  return useQuery<Agent[]>({
     queryKey: [api.viewHistory.list.path],
     queryFn: async () => {
       const res = await fetch(api.viewHistory.list.path, {
@@ -83,7 +84,7 @@ export default function History() {
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {agents.map((agent: any, index: number) => (
+            {agents.map((agent, index) => (
               <motion.div
                 key={agent.id}
                 initial={{ opacity: 0, y: 20 }}

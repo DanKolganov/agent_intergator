@@ -20,6 +20,7 @@ import {
   useAnalyzeCustomRequest,
 } from "../hooks/use-custom-requests";
 import { useQueryClient } from "@tanstack/react-query";
+import { SUPPORT_CONTACTS } from "@shared/contacts";
 
 export default function RequestStatus() {
   const [, params] = useRoute("/custom/:id");
@@ -286,7 +287,7 @@ export default function RequestStatus() {
                                 Устали отвечать на вопросы?
                               </p>
                               <a
-                                href="https://t.me/your_support"
+                                href={SUPPORT_CONTACTS.telegram}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-sm text-primary hover:underline font-medium"

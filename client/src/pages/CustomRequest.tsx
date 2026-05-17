@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { useCreateCustomRequest } from "../hooks/use-custom-requests";
+import { SUPPORT_CONTACTS } from "@shared/contacts";
 
 export default function CustomRequest() {
   const [, setLocation] = useLocation();
@@ -88,7 +89,7 @@ export default function CustomRequest() {
                       </p>
                       <div className="flex gap-2">
                         <a
-                          href="https://t.me/your_support"
+                          href={SUPPORT_CONTACTS.telegram}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm font-medium text-primary hover:underline"
@@ -97,7 +98,7 @@ export default function CustomRequest() {
                         </a>
                         <span className="text-slate-400 dark:text-slate-500">|</span>
                         <a
-                          href="mailto:support@example.com"
+                          href={`mailto:${SUPPORT_CONTACTS.email}`}
                           className="text-sm font-medium text-primary hover:underline"
                         >
                           Email
