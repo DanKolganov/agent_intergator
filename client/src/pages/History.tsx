@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { AgentCard } from "@/components/AgentCard";
 import { useAuth } from "@/hooks/use-auth";
-import { Clock, LogIn } from "lucide-react";
+import { Link } from "wouter";
+import { Clock } from "lucide-react";
 import { api } from "@shared/routes";
 
 function useViewHistory() {
@@ -25,7 +26,7 @@ export default function History() {
   const { data: agents, isLoading } = useViewHistory();
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       <Navbar />
 
       <main className="flex-grow pt-12 pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -44,21 +45,21 @@ export default function History() {
         </div>
 
         {!authLoading && !isAuthenticated ? (
-          <div className="text-center py-32 bg-white rounded-3xl border border-slate-100">
-            <LogIn size={48} className="text-slate-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-slate-700 mb-2">
-              Войдите, чтобы увидеть историю
+          <div className="text-center py-32 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
+            <Clock size={48} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mb-2">
+              История просмотров пуста
             </h2>
-            <p className="text-slate-500 mb-6">
-              Мы сохраняем историю, когда вы авторизованы.
+            <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
+              Откройте карточку агента в каталоге — просмотренные решения появятся
+              здесь после авторизации.
             </p>
-            <a
-              href="/api/login"
+            <Link
+              href="/agents?tab=free"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
             >
-              <LogIn size={16} />
-              Войти
-            </a>
+              Перейти в каталог
+            </Link>
           </div>
         ) : isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

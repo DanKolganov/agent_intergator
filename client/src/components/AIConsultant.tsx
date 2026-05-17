@@ -18,6 +18,41 @@ export default function AIConsultant() {
   const [, setLocation] = useLocation();
   const { data: agents } = useAgents();
 
+  const getCatalogLink = (userMessage: string): string => {
+    const lower = userMessage.toLowerCase();
+    if (
+      lower.includes("клиент") ||
+      lower.includes("покупатель") ||
+      lower.includes("обслуживание")
+    )
+      return "/agents?tab=free&task=customers";
+    if (
+      lower.includes("маркетинг") ||
+      lower.includes("реклама") ||
+      lower.includes("продвижение")
+    )
+      return "/agents?tab=free&task=marketing";
+    if (
+      lower.includes("финансы") ||
+      lower.includes("деньги") ||
+      lower.includes("бюджет")
+    )
+      return "/agents?tab=free&task=finance";
+    if (
+      lower.includes("ресторан") ||
+      lower.includes("кафе") ||
+      lower.includes("еда")
+    )
+      return "/agents?tab=free&business=restaurant";
+    if (
+      lower.includes("отель") ||
+      lower.includes("гостиница") ||
+      lower.includes("бронирование")
+    )
+      return "/agents?tab=free&business=hospitality";
+    return "/agents?tab=free";
+  };
+
   const generateResponse = (userMessage: string): string => {
     const lowerMessage = userMessage.toLowerCase();
 
@@ -266,10 +301,19 @@ export default function AIConsultant() {
 
             <div className="mt-3 text-center">
               <button
-                onClick={() => setLocation("/agents")}
-                className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors dark:text-primary/90 dark:hover:text-primary"
+                onClick={() =>
+                  setLocation(
+                    messages.filter((m) => m.isUser).length > 0
+                      ? getCatalogLink(
+                          messages.filter((m) => m.isUser).slice(-1)[0]?.text ||
+                            input,
+                        )
+                      : "/agents?tab=free",
+                  )
+                }
+                className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors dark:text-primary dark:hover:text-primary/80"
               >
-                <span>Или перейти к полному каталогу решений</span>
+                <span>Перейти к поиску бесплатных решений</span>
                 <ArrowRight size={14} />
               </button>
             </div>

@@ -1,5 +1,5 @@
 import { Link, useRoute } from "wouter";
-import { Bot, Sparkles, LogIn, LogOut, User } from "lucide-react";
+import { Bot, Sparkles, LogOut, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -23,7 +23,9 @@ function NavLink({
       href={href}
       className={cn(
         "relative px-4 py-2 text-sm font-medium transition-colors",
-        isActive ? "text-primary" : "text-slate-600 hover:text-slate-900",
+        isActive
+          ? "text-primary"
+          : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100",
       )}
     >
       {children}
@@ -59,7 +61,8 @@ export function Navbar() {
             </Link>
 
             <nav className="hidden md:flex items-center gap-2">
-              <NavLink href="/agents">Агенты</NavLink>
+              <NavLink href="/agents?tab=free">Каталог</NavLink>
+              <NavLink href="/agents?tab=team">Наши решения</NavLink>
               {isAuthenticated && <NavLink href="/history">История</NavLink>}
             </nav>
           </div>
@@ -74,10 +77,10 @@ export function Navbar() {
                 size={15}
                 className="text-accent group-hover:animate-pulse"
               />
-              <span>Кастомный агент</span>
+              <span>Заказать кастомного агента</span>
             </Link>
 
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200">
                   {user?.profileImageUrl ? (
@@ -102,15 +105,6 @@ export function Navbar() {
                   <span className="hidden sm:block">Выйти</span>
                 </button>
               </div>
-            ) : (
-              <a
-                href="/api/login"
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all duration-200"
-                data-testid="button-login"
-              >
-                <LogIn size={15} />
-                Войти
-              </a>
             )}
           </div>
         </div>

@@ -44,7 +44,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-5xl md:text-7xl font-bold font-display tracking-tight text-slate-900 mb-8 leading-tight"
+                className="text-5xl md:text-7xl font-bold font-display tracking-tight text-slate-900 dark:text-slate-100 mb-8 leading-tight"
               >
                 Найдите идеального{" "}
                 <span className="text-gradient">AI-агента</span>{" "}
@@ -55,7 +55,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-lg md:text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed"
+                className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed"
               >
                 Выберите агента из каталога под вашу отрасль или опишите задачу
                 — и мы соберём кастомного агента под ваш бизнес.
@@ -68,15 +68,15 @@ export default function Home() {
                 className="flex flex-col sm:flex-row items-center justify-center gap-4"
               >
                 <Link
-                  href="/agents"
+                  href="/agents?tab=free"
                   className="w-full sm:w-auto px-8 py-4 rounded-2xl font-semibold bg-primary text-white shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <Bot size={20} />
-                  Открыть каталог
+                  Каталог бесплатных ИИ решений
                 </Link>
                 <Link
                   href="/custom"
-                  className="w-full sm:w-auto px-8 py-4 rounded-2xl font-semibold bg-white text-slate-700 border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-8 py-4 rounded-2xl font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <Sparkles size={20} className="text-accent" />
                   Заказать кастомного агента
@@ -115,7 +115,7 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="group"
               >
-                <Link href="/agents?business=hospitality">
+                <Link href="/agents?tab=free&business=hospitality">
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <HomeIcon size={32} />
@@ -145,7 +145,7 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
                 className="group"
               >
-                <Link href="/agents?business=restaurant">
+                <Link href="/agents?tab=free&business=restaurant">
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 hover:border-orange-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-orange-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Utensils size={32} />
@@ -175,7 +175,7 @@ export default function Home() {
                 transition={{ delay: 0.3 }}
                 className="group"
               >
-                <Link href="/agents?business=retail">
+                <Link href="/agents?tab=free&business=retail">
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200 hover:border-green-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <ShoppingCart size={32} />
@@ -204,7 +204,7 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="group"
               >
-                <Link href="/agents?business=rental">
+                <Link href="/agents?tab=free&business=rental">
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-purple-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Car size={32} />
@@ -234,7 +234,7 @@ export default function Home() {
                 transition={{ delay: 0.5 }}
                 className="group"
               >
-                <Link href="/agents?business=service">
+                <Link href="/agents?tab=free&business=service">
                   <div className="p-8 rounded-3xl bg-gradient-to-br from-pink-50 to-pink-100 border border-pink-200 hover:border-pink-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-pink-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Wrench size={32} />
@@ -264,8 +264,8 @@ export default function Home() {
                 transition={{ delay: 0.6 }}
                 className="group"
               >
-                <Link href="/agents">
-                  <div className="p-8 rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                <Link href="/agents?tab=free">
+                  <div className="p-8 rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 border border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-slate-600 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Bot size={32} />
                     </div>
@@ -314,7 +314,7 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="group"
               >
-                <Link href="/agents?task=customers">
+                <Link href="/agents?tab=free&task=customers">
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
                       <BrainCircuit size={24} />
@@ -337,7 +337,7 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
                 className="group"
               >
-                <Link href="/agents?task=marketing">
+                <Link href="/agents?tab=free&task=marketing">
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-accent/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4">
                       <Sparkles size={24} />
@@ -359,7 +359,7 @@ export default function Home() {
                 transition={{ delay: 0.3 }}
                 className="group"
               >
-                <Link href="/agents?task=finance">
+                <Link href="/agents?tab=free&task=finance">
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-green-500/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 mb-4">
                       <Building2 size={24} />
@@ -382,7 +382,7 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="group"
               >
-                <Link href="/agents?task=hr">
+                <Link href="/agents?tab=free&task=hr">
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 mb-4">
                       <Users size={24} />
@@ -405,7 +405,7 @@ export default function Home() {
                 transition={{ delay: 0.5 }}
                 className="group"
               >
-                <Link href="/agents?task=operations">
+                <Link href="/agents?tab=free&task=operations">
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-orange-500/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 mb-4">
                       <ArrowRight size={24} />
@@ -428,8 +428,8 @@ export default function Home() {
                 transition={{ delay: 0.6 }}
                 className="group"
               >
-                <Link href="/agents">
-                  <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 hover:border-primary/40 hover:shadow-md transition-all duration-300 cursor-pointer">
+                <Link href="/agents?tab=free">
+                  <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-accent/5 dark:from-primary/10 dark:to-accent/10 border border-primary/20 dark:border-primary/30 hover:border-primary/40 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white mb-4">
                       <Bot size={24} />
                     </div>

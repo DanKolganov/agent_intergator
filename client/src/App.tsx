@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 
 import Home from "./pages/Home";
 import Agents from "./pages/Agents";
+import AgentDetail from "./pages/AgentDetail";
 import CustomRequest from "./pages/CustomRequest";
 import RequestStatus from "./pages/RequestStatus";
 import History from "./pages/History";
@@ -15,6 +16,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/agents/:id" component={AgentDetail} />
       <Route path="/agents" component={Agents} />
       <Route path="/custom" component={CustomRequest} />
       <Route path="/custom/:id" component={RequestStatus} />

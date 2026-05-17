@@ -18,7 +18,7 @@ const agentsData = [
     industry: "E-commerce",
     useCase: "Обслуживание клиентов",
     tags: ["поддержка клиентов", "чат-бот", "автоответчик", "FAQ"],
-    isTeamSolution: false,
+    isTeamSolution: true,
   },
   {
     id: 2,
