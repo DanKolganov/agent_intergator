@@ -468,7 +468,7 @@ export default function Home() {
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   Агенты заточены под доменную экспертизу — от e-commerce до
-                  финтеха — и “говорят на вашем языке”.
+                  финтеха — и "говорят на вашем языке".
                 </p>
               </motion.div>
 
