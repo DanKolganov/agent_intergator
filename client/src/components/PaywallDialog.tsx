@@ -17,7 +17,7 @@ export function PaywallDialog({ open, onOpenChange, message }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 p-4 text-sm text-slate-700 dark:text-slate-300">
           Сейчас оплата не подключена автоматически. Если хотите — я добавлю Stripe Checkout и тарифы.
         </div>
 
@@ -32,7 +32,7 @@ export function PaywallDialog({ open, onOpenChange, message }: Props) {
             Оплатить (связаться)
           </button>
           <button
-            className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-600 px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
             onClick={() => onOpenChange(false)}
           >
             Закрыть

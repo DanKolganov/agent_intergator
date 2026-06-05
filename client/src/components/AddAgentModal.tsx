@@ -86,75 +86,75 @@ export default function AddAgentModal({ onClose, initial }: Props) {
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-y-auto max-h-[90vh]"
+          className=”bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-xl overflow-y-auto max-h-[90vh]”
         >
-          <div className="flex items-center justify-between p-6 border-b border-slate-100">
-            <h2 className="text-xl font-bold font-display text-slate-900">Добавить агента</h2>
-            <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-100 transition-colors">
-              <X size={18} className="text-slate-500" />
+          <div className=”flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700”>
+            <h2 className=”text-xl font-bold font-display text-slate-900 dark:text-slate-100”>Добавить агента</h2>
+            <button onClick={onClose} className=”p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors”>
+              <X size={18} className=”text-slate-500 dark:text-slate-400” />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className=”p-6 space-y-4”>
             {[
-              { label: "Название агента", key: "name", placeholder: "Например: Smart Invoice Bot" },
-              { label: "Отрасль", key: "industry", placeholder: "Например: Финансы" },
-              { label: "Сценарий", key: "useCase", placeholder: "Например: Автоматизация бухгалтерии" },
-              { label: "Картинка (URL, опционально)", key: "imageUrl", placeholder: "https://..." },
+              { label: “Название агента”, key: “name”, placeholder: “Например: Smart Invoice Bot” },
+              { label: “Отрасль”, key: “industry”, placeholder: “Например: Финансы” },
+              { label: “Сценарий”, key: “useCase”, placeholder: “Например: Автоматизация бухгалтерии” },
+              { label: “Картинка (URL, опционально)”, key: “imageUrl”, placeholder: “https://...” },
             ].map(({ label, key, placeholder }) => (
               <div key={key}>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">{label}</label>
+                <label className=”block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1”>{label}</label>
                 <input
-                  type="text"
+                  type=”text”
                   placeholder={placeholder}
                   value={(form as any)[key]}
                   onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
+                  className=”w-full px-4 py-2.5 bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all”
                   data-testid={`input-${key}`}
                 />
               </div>
             ))}
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Описание</label>
+              <label className=”block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1”>Описание</label>
               <textarea
                 rows={3}
-                placeholder="Что делает этот агент?"
+                placeholder=”Что делает этот агент?”
                 value={form.description}
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all resize-none"
-                data-testid="input-description"
+                className=”w-full px-4 py-2.5 bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all resize-none”
+                data-testid=”input-description”
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Теги</label>
-              <div className="flex gap-2">
+              <label className=”block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1”>Теги</label>
+              <div className=”flex gap-2”>
                 <input
-                  type="text"
+                  type=”text”
                   value={tagInput}
                   onChange={e => setTagInput(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())}
-                  placeholder="Введите тег и нажмите Enter"
-                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-                  data-testid="input-tag"
+                  onKeyDown={e => e.key === “Enter” && (e.preventDefault(), addTag())}
+                  placeholder=”Введите тег и нажмите Enter”
+                  className=”flex-1 px-4 py-2.5 bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all”
+                  data-testid=”input-tag”
                 />
                 <button
-                  type="button"
+                  type=”button”
                   onClick={addTag}
-                  className="p-2.5 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
+                  className=”p-2.5 bg-slate-100 dark:bg-slate-700 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors”
                 >
-                  <Plus size={16} className="text-slate-600" />
+                  <Plus size={16} className=”text-slate-600 dark:text-slate-300” />
                 </button>
               </div>
               {form.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className=”flex flex-wrap gap-2 mt-2”>
                   {form.tags.map(tag => (
-                    <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                    <span key={tag} className=”inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium”>
                       <Tag size={10} />
                       {tag}
-                      <button type="button" onClick={() => removeTag(tag)}>
-                        <X size={10} className="ml-1" />
+                      <button type=”button” onClick={() => removeTag(tag)}>
+                        <X size={10} className=”ml-1” />
                       </button>
                     </span>
                   ))}
@@ -162,24 +162,24 @@ export default function AddAgentModal({ onClose, initial }: Props) {
               )}
             </div>
 
-            <div className="flex items-center gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
+            <div className=”flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/40”>
               <input
-                type="checkbox"
-                id="isTeam"
+                type=”checkbox”
+                id=”isTeam”
                 checked={form.isTeamSolution}
                 onChange={e => setForm(f => ({ ...f, isTeamSolution: e.target.checked }))}
-                className="w-4 h-4 accent-primary"
+                className=”w-4 h-4 accent-primary”
               />
-              <label htmlFor="isTeam" className="text-sm font-medium text-amber-800 cursor-pointer">
+              <label htmlFor=”isTeam” className=”text-sm font-medium text-amber-800 dark:text-amber-300 cursor-pointer”>
                 Отметить как “Наше решение” (видно во вкладке “Наши решения”)
               </label>
             </div>
 
-            <div className="flex gap-3 pt-2">
+            <div className=”flex gap-3 pt-2”>
               <button
-                type="button"
+                type=”button”
                 onClick={onClose}
-                className="flex-1 py-3 rounded-xl font-semibold text-sm text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors"
+                className=”flex-1 py-3 rounded-xl font-semibold text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors”
               >
                 Отмена
               </button>

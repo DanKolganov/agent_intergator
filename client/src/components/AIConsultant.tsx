@@ -251,10 +251,10 @@ export default function AIConsultant() {
                 type="button"
                 onClick={handleSend}
                 disabled={!input.trim() || isTyping}
-                className="px-6 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+                className="px-3 sm:px-6 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm shrink-0"
               >
                 <Send size={16} />
-                Отправить
+                <span className="hidden sm:inline">Отправить</span>
               </button>
             </div>
 

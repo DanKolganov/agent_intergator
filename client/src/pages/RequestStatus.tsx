@@ -90,25 +90,25 @@ export default function RequestStatus() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       <Navbar />
 
       <main className="flex-grow py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32 space-y-4">
             <Loader2 size={40} className="text-primary animate-spin" />
-            <p className="text-slate-500 font-medium">
-              Loading request details...
+            <p className="text-slate-500 dark:text-slate-400 font-medium">
+              Загружаем заявку...
             </p>
           </div>
         ) : error || !request ? (
-          <div className="glass-panel rounded-3xl p-8 text-center border-red-100">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 text-center border border-red-100 dark:border-red-900/30">
             <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-              Request Not Found
+              Заявка не найдена
             </h2>
             <p className="text-slate-600 dark:text-slate-400">
-              We couldn't find the custom request you're looking for.
+              Не удалось найти заявку с таким идентификатором.
             </p>
           </div>
         ) : (
@@ -162,24 +162,24 @@ export default function RequestStatus() {
 
             {/* Tabs for Recommendation and Code */}
             {!isAnalyzing && isCompleted && (
-              <div className="flex gap-2 p-1 bg-slate-200 rounded-2xl w-fit">
+              <div className="flex gap-1 p-1 bg-slate-200 dark:bg-slate-700 rounded-2xl w-fit flex-wrap">
                 <button
                   onClick={() => setActiveTab("recommendation")}
-                  className={`px-6 py-2 rounded-xl font-medium transition-all ${activeTab === "recommendation" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                  className={`px-4 sm:px-6 py-2 rounded-xl font-medium text-sm transition-all ${activeTab === "recommendation" ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"}`}
                 >
-                  Recommendation
+                  Рекомендация
                 </button>
                 <button
                   onClick={() => setActiveTab("code")}
-                  className={`px-6 py-2 rounded-xl font-medium transition-all ${activeTab === "code" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                  className={`px-4 sm:px-6 py-2 rounded-xl font-medium text-sm transition-all ${activeTab === "code" ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"}`}
                 >
-                  Agent Code
+                  Код агента
                 </button>
                 <button
                   onClick={() => setActiveTab("readme")}
-                  className={`px-6 py-2 rounded-xl font-medium transition-all ${activeTab === "readme" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                  className={`px-4 sm:px-6 py-2 rounded-xl font-medium text-sm transition-all ${activeTab === "readme" ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"}`}
                 >
-                  Setup Guide
+                  Инструкция
                 </button>
               </div>
             )}
@@ -204,10 +204,10 @@ export default function RequestStatus() {
                     )}
                     <h2 className="text-xl font-bold font-display">
                       {activeTab === "recommendation"
-                        ? "AI Architect Recommendation"
+                        ? "Рекомендация AI-архитектора"
                         : activeTab === "code"
-                          ? "Generated Agent Code"
-                          : "Installation Guide"}
+                          ? "Сгенерированный код агента"
+                          : "Инструкция по установке"}
                     </h2>
                   </div>
                   {!isAnalyzing &&
@@ -312,12 +312,10 @@ export default function RequestStatus() {
                         </div>
                       </div>
                       <h3 className="text-xl font-semibold mb-2">
-                        Processing your workflow...
+                        Анализируем ваш запрос...
                       </h3>
                       <p className="text-slate-400 max-w-md text-center">
-                        Our intelligence engine is mapping your business needs
-                        to optimal AI agent architectures and generating
-                        deployment-ready code.
+                        AI изучает потребности бизнеса и подбирает оптимальную архитектуру агента. Генерируем готовый код для развёртывания.
                       </p>
                     </div>
                   ) : (
@@ -334,7 +332,7 @@ export default function RequestStatus() {
                           </div>
                         ) : (
                           <p className="text-slate-400 italic">
-                            No recommendation generated.
+                            Рекомендация не сгенерирована.
                           </p>
                         )
                       ) : activeTab === "code" ? (
@@ -359,12 +357,12 @@ export default function RequestStatus() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm"
+              className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm"
             >
-              <h3 className="font-semibold text-slate-900 mb-4 uppercase tracking-wider text-sm">
-                Original Submission
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider text-sm">
+                Исходная заявка
               </h3>
-              <p className="text-slate-600 leading-relaxed bg-slate-50 p-6 rounded-2xl border border-slate-100">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700">
                 {request.businessNeeds}
               </p>
             </motion.div>

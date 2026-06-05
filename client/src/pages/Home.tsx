@@ -48,7 +48,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-5xl md:text-7xl font-bold font-display tracking-tight text-slate-900 dark:text-slate-100 mb-8 leading-tight"
+                className="text-4xl sm:text-5xl md:text-7xl font-bold font-display tracking-tight text-slate-900 dark:text-slate-100 mb-8 leading-tight"
               >
                 Найдите идеального{" "}
                 <span className="text-gradient">AI-агента</span>{" "}
@@ -120,7 +120,7 @@ export default function Home() {
                 className="group"
               >
                 <Link href={catalogUrlForBusiness("hospitality")}>
-                  <div className="p-8 rounded-3xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                  <div className="p-8 rounded-3xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <HomeIcon size={32} />
                     </div>
@@ -131,7 +131,7 @@ export default function Home() {
                       Автоматизация бронирования, управление отзывами,
                       оптимизация загрузки номеров
                     </p>
-                    <div className="flex items-center text-blue-600 font-medium">
+                    <div className="flex items-center text-blue-600 dark:text-blue-400 font-medium">
                       <span>Смотреть решения</span>
                       <ArrowRight
                         size={16}
@@ -150,7 +150,7 @@ export default function Home() {
                 className="group"
               >
                 <Link href={catalogUrlForBusiness("restaurant")}>
-                  <div className="p-8 rounded-3xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 hover:border-orange-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                  <div className="p-8 rounded-3xl bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border border-orange-200 dark:border-orange-800 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-orange-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Utensils size={32} />
                     </div>
@@ -161,7 +161,7 @@ export default function Home() {
                       Управление заказами, работа с отзывами, аналитика
                       посещаемости
                     </p>
-                    <div className="flex items-center text-orange-600 font-medium">
+                    <div className="flex items-center text-orange-600 dark:text-orange-400 font-medium">
                       <span>Смотреть решения</span>
                       <ArrowRight
                         size={16}
@@ -180,7 +180,7 @@ export default function Home() {
                 className="group"
               >
                 <Link href={catalogUrlForBusiness("retail")}>
-                  <div className="p-8 rounded-3xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200 hover:border-green-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                  <div className="p-8 rounded-3xl bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <ShoppingCart size={32} />
                     </div>
@@ -190,7 +190,7 @@ export default function Home() {
                     <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
                       Управление запасами, работа с клиентами, аналитика продаж
                     </p>
-                    <div className="flex items-center text-green-600 font-medium">
+                    <div className="flex items-center text-green-600 dark:text-green-400 font-medium">
                       <span>Смотреть решения</span>
                       <ArrowRight
                         size={16}
@@ -209,7 +209,7 @@ export default function Home() {
                 className="group"
               >
                 <Link href={catalogUrlForBusiness("rental")}>
-                  <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                  <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border border-purple-200 dark:border-purple-800 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-purple-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Car size={32} />
                     </div>
@@ -220,7 +220,7 @@ export default function Home() {
                       Управление арендой, обработка заявок, автоматизация
                       платежей
                     </p>
-                    <div className="flex items-center text-purple-600 font-medium">
+                    <div className="flex items-center text-purple-600 dark:text-purple-400 font-medium">
                       <span>Смотреть решения</span>
                       <ArrowRight
                         size={16}
@@ -239,7 +239,7 @@ export default function Home() {
                 className="group"
               >
                 <Link href={catalogUrlForBusiness("service")}>
-                  <div className="p-8 rounded-3xl bg-gradient-to-br from-pink-50 to-pink-100 border border-pink-200 hover:border-pink-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                  <div className="p-8 rounded-3xl bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-950 dark:to-pink-900 border border-pink-200 dark:border-pink-800 hover:border-pink-300 dark:hover:border-pink-700 hover:shadow-lg transition-all duration-300 cursor-pointer">
                     <div className="w-16 h-16 rounded-2xl bg-pink-500 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                       <Wrench size={32} />
                     </div>
@@ -250,7 +250,7 @@ export default function Home() {
                       Запись клиентов, управление расписанием, автоматизация
                       напоминаний
                     </p>
-                    <div className="flex items-center text-pink-600 font-medium">
+                    <div className="flex items-center text-pink-600 dark:text-pink-400 font-medium">
                       <span>Смотреть решения</span>
                       <ArrowRight
                         size={16}

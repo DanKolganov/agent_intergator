@@ -67,14 +67,14 @@ export default function History() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-3xl p-4 border border-slate-100 animate-pulse h-64"
+                className="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-100 dark:border-slate-700 animate-pulse h-64"
               />
             ))}
           </div>
         ) : !agents || agents.length === 0 ? (
-          <div className="text-center py-32 bg-white rounded-3xl border border-slate-100">
-            <Clock size={48} className="text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500 font-medium text-lg">
+          <div className="text-center py-32 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
+            <Clock size={48} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+            <p className="text-slate-500 dark:text-slate-400 font-medium text-lg">
               Пока пусто. Начните просматривать агентов!
             </p>
           </div>
