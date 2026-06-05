@@ -7,7 +7,7 @@ export const SUPPORT_CONTACTS = {
     (typeof process !== "undefined" && process.env?.SUPPORT_TELEGRAM) ||
     (typeof import.meta !== "undefined" &&
       (import.meta as any).env?.VITE_SUPPORT_TELEGRAM) ||
-    "https://t.me/your_support",
+    "https://t.me/anastasiia_kuzakova",
   email:
     (typeof process !== "undefined" && process.env?.SUPPORT_EMAIL) ||
     (typeof import.meta !== "undefined" &&
